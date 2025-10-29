@@ -183,6 +183,46 @@ a:focus {
   padding: 1.4rem;
 }
 
+/* Maintenance Body: <body class="maintenance-body"> */
+.maintenance-body {
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  background: var(--page-bg);
+  color: var(--text-color);
+  margin: 0;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* Maintenance Main: <main class="maintenance-main"> */
+.maintenance-main {
+  width: min(90%, 520px);
+}
+
+/* Maintenance Box: <section class="maintenance-box"> */
+.maintenance-box {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+}
+
+/* Maintenance Titel: <h1 class="maintenance-title"> */
+.maintenance-title {
+  margin: 0 0 1rem;
+  font-size: 2rem;
+}
+
+/* Maintenance Hinweis: <p class="maintenance-hint"> */
+.maintenance-hint {
+  margin: 1.5rem 0 0;
+  opacity: 0.75;
+  font-size: 0.95rem;
+}
+
 /* CV-Sektion: <section class="cv-section"> */
 .cv-section {
   margin-bottom: 2rem;

@@ -22,8 +22,44 @@ function insertCurrentYear() {
   });
 }
 
+// Prüft, ob maintenance.json Wartungsmodus aktiviert hat.
+async function checkMaintenanceMode() {
+  const maintenancePath = '/maintenance.html';
+  const isMaintenancePage = window.location.pathname === maintenancePath;
+
+  try {
+    const response = await fetch('/maintenance.json', { cache: 'no-store' });
+    if (!response.ok) {
+      return;
+    }
+
+    const data = await response.json();
+    const isEnabled = Boolean(data.enabled);
+
+    if (isEnabled && !isMaintenancePage) {
+      window.location.href = maintenancePath;
+      return;
+    }
+
+    if (!isEnabled && isMaintenancePage) {
+      window.location.href = '/';
+      return;
+    }
+
+    if (isMaintenancePage && data.message) {
+      const target = document.querySelector('[data-maintenance-message]');
+      if (target) {
+        target.textContent = data.message;
+      }
+    }
+  } catch (error) {
+    console.warn('maintenance.json konnte nicht geladen werden:', error);
+  }
+}
+
 // Startpunkt nach dem Laden der Seite.
 function initSite() {
+  checkMaintenanceMode();
   highlightActiveNav();
   insertCurrentYear();
 }
