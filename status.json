@@ -1,0 +1,9 @@
+{
+  "last_update": "initial",
+  "services": {
+    "Home Assistant": "unknown",
+    "Pi-hole": "unknown",
+    "MQTT": "unknown",
+    "Uptime Kuma": "unknown"
+  }
+}
