@@ -1,3 +1,13 @@
+const maintenanceConfig = {
+  jsonPath: '/maintenance.json',
+  pagePath: '/maintenance.html',
+  homePath: '/',
+  pollIntervalMs: 15000,
+};
+
+let maintenanceState = { enabled: null, message: null };
+let maintenanceIntervalId = null;
+
 // Markiert in der Navigation den Link zur aktuellen Seite.
 function highlightActiveNav() {
   const currentPath = window.location.pathname.replace(/index\.html$/, '');
@@ -22,44 +32,69 @@ function insertCurrentYear() {
   });
 }
 
-// Prüft, ob maintenance.json Wartungsmodus aktiviert hat.
-async function checkMaintenanceMode() {
-  const maintenancePath = '/maintenance.html';
-  const isMaintenancePage = window.location.pathname === maintenancePath;
+function updateMaintenanceMessage(message) {
+  const target = document.querySelector('[data-maintenance-message]');
+  if (!target) {
+    return;
+  }
 
+  const defaultMessage = target.dataset.defaultMessage || target.textContent || '';
+  target.textContent = message || defaultMessage;
+}
+
+async function fetchMaintenanceData() {
   try {
-    const response = await fetch('/maintenance.json', { cache: 'no-store' });
+    const response = await fetch(maintenanceConfig.jsonPath, { cache: 'no-store' });
     if (!response.ok) {
-      return;
+      return null;
     }
 
     const data = await response.json();
-    const isEnabled = Boolean(data.enabled);
-
-    if (isEnabled && !isMaintenancePage) {
-      window.location.href = maintenancePath;
-      return;
-    }
-
-    if (!isEnabled && isMaintenancePage) {
-      window.location.href = '/';
-      return;
-    }
-
-    if (isMaintenancePage && data.message) {
-      const target = document.querySelector('[data-maintenance-message]');
-      if (target) {
-        target.textContent = data.message;
-      }
-    }
+    return {
+      enabled: Boolean(data.enabled),
+      message: typeof data.message === 'string' ? data.message.trim() : '',
+    };
   } catch (error) {
     console.warn('maintenance.json konnte nicht geladen werden:', error);
+    return null;
+  }
+}
+
+async function checkMaintenanceMode() {
+  const data = await fetchMaintenanceData();
+  if (!data) {
+    return;
+  }
+
+  const isMaintenancePage = window.location.pathname === maintenanceConfig.pagePath;
+  maintenanceState = data;
+
+  if (data.enabled && !isMaintenancePage) {
+    window.location.href = maintenanceConfig.pagePath;
+    return;
+  }
+
+  if (!data.enabled && isMaintenancePage) {
+    window.location.href = maintenanceConfig.homePath;
+    return;
+  }
+
+  if (isMaintenancePage) {
+    updateMaintenanceMessage(data.message);
+  }
+}
+
+function startMaintenanceWatcher() {
+  checkMaintenanceMode();
+
+  if (maintenanceIntervalId === null && maintenanceConfig.pollIntervalMs > 0) {
+    maintenanceIntervalId = window.setInterval(checkMaintenanceMode, maintenanceConfig.pollIntervalMs);
   }
 }
 
 // Startpunkt nach dem Laden der Seite.
 function initSite() {
-  checkMaintenanceMode();
+  startMaintenanceWatcher();
   highlightActiveNav();
   insertCurrentYear();
 }

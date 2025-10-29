@@ -10,8 +10,14 @@
   <main class="maintenance-main">
     <section class="maintenance-box" aria-labelledby="maintenance-title">
       <h1 class="maintenance-title" id="maintenance-title">Wartungsfenster</h1>
-      <p data-maintenance-message>Ich spiele gerade Updates ein. Bitte versuch es in ein paar Minuten erneut.</p>
-      <p class="maintenance-hint">Bleib entspannt – alle Services kommen gleich wieder online.</p>
+      <p
+        class="maintenance-message"
+        data-maintenance-message
+        data-default-message="Wir aktualisieren gerade unsere Systeme. Das dauert selten länger als ein paar Minuten."
+      >
+        Wir aktualisieren gerade unsere Systeme. Das dauert selten länger als ein paar Minuten.
+      </p>
+      <p class="maintenance-hint">Die Seite lädt automatisch neu, sobald alles wieder läuft.</p>
     </section>
   </main>
   <script src="/js/site.js" defer></script>
