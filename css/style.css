@@ -1,0 +1,283 @@
+/* Schrift importieren (nur eine Zeile, damit leicht zu kontrollieren) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+/* Basiseinstellungen: wenige Variablen halten das Styling übersichtlich */
+:root {
+  --accent: #81C784;
+  --page-bg: #f5f5f5;
+  --text-color: #1f1f1f;
+  --surface-color: #ffffff;
+  --border-color: #cccccc;
+  --max-width: 720px;
+}
+
+/* Dark Mode nutzt die gleichen Variablen in einer dunkleren Variante */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page-bg: #101010;
+    --text-color: #f5f5f5;
+    --surface-color: #1a1a1a;
+    --border-color: #2d2d2d;
+  }
+}
+
+/* Sorgt dafür, dass Padding/Border bei allen Elementen gleich behandelt wird */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Grundlayout: <body> umfasst gesamte Seite */
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--page-bg);
+  color: var(--text-color);
+  line-height: 1.6;
+}
+
+/* Hauptbereich: <main> in index.html */
+main {
+  flex: 1;
+  width: min(90%, var(--max-width));
+  margin: 0 auto 2.5rem;
+}
+
+/* Standardlinks: alle <a> */
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+/* Link-Hover/Fokus-Status: alle <a> */
+a:hover,
+a:focus {
+  text-decoration: underline;
+}
+
+/* Header: <header class="site-header"> */
+.site-header {
+  width: min(90%, var(--max-width));
+  margin: 2.5rem auto 1.5rem;
+  text-align: center;
+}
+
+/* Überschrift: <h1 class="site-title"> */
+.site-title {
+  margin: 0;
+  font-size: 2.2rem;
+}
+
+/* Link im Titel: <a class="site-title__link"> */
+.site-title__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Untertitel: <p class="site-subtitle"> */
+.site-subtitle {
+  margin: 0.4rem 0 0;
+  opacity: 0.8;
+  color: #81C784;
+}
+
+/* Navigation: <nav class="site-nav"> */
+.site-nav {
+  width: min(90%, var(--max-width));
+  margin: 0 auto 2rem;
+}
+
+/* Navigationsliste: <ul class="site-nav__list"> */
+.site-nav__list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+}
+
+/* Navigationslink: <a class="site-nav__link"> */
+.site-nav__link {
+  display: inline-block;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  color: inherit;
+  transition: border-color 0.2s ease;
+}
+
+.site-nav__link:hover,
+.site-nav__link:focus {
+  border-color: var(--accent);
+  text-decoration: none;
+}
+
+/* Markierter Navigationslink: <a class="site-nav__link site-nav__link--active"> */
+.site-nav__link--active {
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
+/* Info-Bar: <section class="hero-bar"> */
+.hero-bar {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  padding: 1rem 1.4rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+@media (min-width: 640px) {
+  .hero-bar {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    text-align: left;
+  }
+}
+
+/* Info-Bar Haupttext: <p class="hero-bar__lead"> */
+.hero-bar__lead {
+  margin: 0;
+  font-weight: 600;
+}
+
+/* Info-Bar Linkliste: <p class="hero-bar__links"> */
+.hero-bar__links {
+  margin: 0;
+  font-size: 0.95rem;
+  opacity: 0.85;
+}
+
+/* Unterseitenkopf: <header class="page-header"> */
+.page-header {
+  margin: 2rem 0 1.5rem;
+}
+
+/* Unterseitentitel: <h1 class="page-title"> */
+.page-title {
+  margin: 0;
+  font-size: 2rem;
+}
+
+/* Unterseitenintro: <p class="page-intro"> */
+.page-intro {
+  margin: 0.6rem 0 0;
+  opacity: 0.8;
+}
+
+/* Unterseiteninhalt-Box: <section class="content-shell"> */
+.content-shell {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 1.4rem;
+}
+
+/* CV-Sektion: <section class="cv-section"> */
+.cv-section {
+  margin-bottom: 2rem;
+}
+
+/* CV-Sektionstitel: <h2 class="cv-section__title"> */
+.cv-section__title {
+  margin: 0 0 0.75rem;
+  font-size: 1.4rem;
+}
+
+/* CV-Grid: <div class="cv-grid"> */
+.cv-grid {
+  display: grid;
+  gap: 1.4rem;
+}
+
+@media (min-width: 720px) {
+  .cv-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* CV-Abschnittsüberschrift: <h3 class="cv-subtitle"> */
+.cv-subtitle {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+/* CV-Listen: <ul class="cv-list"> */
+.cv-list {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.cv-list li {
+  margin-bottom: 0.4rem;
+}
+
+/* CV-Listen Inline: <ul class="cv-list cv-list--inline"> */
+.cv-list--inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding-left: 0;
+  list-style: none;
+}
+
+.cv-list--inline li::after {
+  content: '·';
+  margin-left: 0.75rem;
+}
+
+.cv-list--inline li:last-child::after {
+  content: '';
+}
+
+/* CV-Eintrag: <article class="cv-entry"> */
+.cv-entry {
+  border-top: 1px solid var(--border-color);
+  padding-top: 1rem;
+  margin-top: 1rem;
+}
+
+.cv-entry:first-of-type {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0;
+}
+
+/* Kopf eines CV-Eintrags: <header class="cv-entry__header"> */
+.cv-entry__header {
+  margin-bottom: 0.75rem;
+}
+
+/* Titel eines CV-Eintrags: <h3 class="cv-entry__title"> */
+.cv-entry__title {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+/* Meta-Infos in CV-Einträgen: <p class="cv-entry__meta"> */
+.cv-entry__meta {
+  margin: 0.2rem 0 0;
+  font-size: 0.95rem;
+  opacity: 0.75;
+}
+
+/* Footer: <footer class="site-footer"> */
+.site-footer {
+  width: min(90%, var(--max-width));
+  margin: auto auto 2.2rem;
+  text-align: center;
+  font-size: 0.95rem;
+  opacity: 0.8;
+  color: #c0c0c0;
+}
