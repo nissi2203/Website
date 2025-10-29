@@ -1,9 +1,9 @@
 {
-  "last_update": "initial",
+  "last_update": "2025-10-29T23:41:47Z",
   "services": {
-    "Home Assistant": "unknown",
-    "Pi-hole": "unknown",
-    "MQTT": "unknown",
-    "Uptime Kuma": "unknown"
+    "Home Assistant": "online",
+    "Pi-hole": "online",
+    "MQTT": "offline",
+    "Uptime Kuma": "online"
   }
 }
