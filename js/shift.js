@@ -14,6 +14,7 @@ let statusNode;
 let tableBody;
 let submitBtn;
 let fetchBtn;
+let deleteBtn;
 
 function setStatus(message, isError = false) {
   if (!statusNode) return;
