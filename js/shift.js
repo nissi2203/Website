@@ -23,10 +23,35 @@ function setStatus(message, isError = false) {
 }
 
 function parseDate(value) {
-  const [dd, mm, yy] = value.split('.');
-  if (!dd || !mm || !yy) return null;
-  const year = yy.length === 2 ? Number(`20${yy}`) : Number(yy);
-  return new Date(year, Number(mm) - 1, Number(dd));
+  if (!value) return null;
+  const trimmed = String(value).trim();
+  if (!trimmed) return null;
+
+  const base = trimmed.split('T')[0];
+  let day;
+  let month;
+  let year;
+
+  const dotMatch = base.match(/^(\d{1,2})\.(\d{1,2})\.(\d{2}|\d{4})$/);
+  if (dotMatch) {
+    day = Number(dotMatch[1]);
+    month = Number(dotMatch[2]);
+    year = Number(dotMatch[3]);
+    if (year < 100) {
+      year += 2000;
+    }
+  } else {
+    const dashMatch = base.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+    if (!dashMatch) {
+      return null;
+    }
+    year = Number(dashMatch[1]);
+    month = Number(dashMatch[2]);
+    day = Number(dashMatch[3]);
+  }
+
+  const parsed = new Date(year, month - 1, day);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
 function formatWeekday(date) {
@@ -77,6 +102,7 @@ async function submitShift() {
   const normalisedDate = normaliseDateInputValue(dateInput.value);
   if (normalisedDate) {
     dateInput.value = normalisedDate;
+    updateDayFromDate();
   }
   const parsedDate = parseDate(normalisedDate || dateInput.value);
   const tag = parsedDate ? formatWeekday(parsedDate) : '';
@@ -120,25 +146,17 @@ function normaliseDateInputValue(value) {
   if (!parsed) return '';
   const dd = String(parsed.getDate()).padStart(2, '0');
   const mm = String(parsed.getMonth() + 1).padStart(2, '0');
-  const yy = String(parsed.getFullYear()).slice(-2);
-  return `${dd}.${mm}.${yy}`;
+  const yyyy = String(parsed.getFullYear());
+  return `${dd}.${mm}.${yyyy}`;
 }
 
 function normaliseApiDate(value) {
-  if (!value) return '';
-  if (value.includes('-')) {
-    const [year, month, day] = value.split('-');
-    const dd = day.padStart(2, '0');
-    const mm = month.padStart(2, '0');
-    const yy = String(year).slice(-2);
-    return `${dd}.${mm}.${yy}`;
-  }
-  if (value.length === 10 && value.charAt(2) === '.') {
-    const [dd, mm, yyyy] = value.split('.');
-    const yy = String(yyyy).slice(-2);
-    return `${dd}.${mm}.${yy}`;
-  }
-  return value;
+  const parsed = parseDate(value);
+  if (!parsed) return value || '';
+  const dd = String(parsed.getDate()).padStart(2, '0');
+  const mm = String(parsed.getMonth() + 1).padStart(2, '0');
+  const yyyy = String(parsed.getFullYear());
+  return `${dd}.${mm}.${yyyy}`;
 }
 
 async function fetchShifts() {
@@ -195,19 +213,6 @@ function renderTable(entries) {
       row.append(cell);
     });
 
-    const deleteCell = document.createElement('td');
-    const deleteButton = document.createElement('button');
-    deleteButton.type = 'button';
-    deleteButton.textContent = '🗑️ Löschen';
-    deleteButton.className = 'shift-table__delete';
-    if (displayDatum) {
-      deleteButton.addEventListener('click', () => deleteShiftsByDate(displayDatum));
-    } else {
-      deleteButton.disabled = true;
-    }
-    deleteCell.append(deleteButton);
-    row.append(deleteCell);
-
     tableBody.append(row);
   });
 }
@@ -221,6 +226,18 @@ function bindEvents() {
   endInput.addEventListener('change', calculateTotals);
   submitBtn.addEventListener('click', submitShift);
   fetchBtn.addEventListener('click', fetchShifts);
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', () => {
+      const normalisedDate = normaliseDateInputValue(dateInput.value);
+      if (!normalisedDate) {
+        setStatus('Bitte ein gültiges Datum angeben, um Schichten zu löschen.', true);
+        return;
+      }
+      dateInput.value = normalisedDate;
+      updateDayFromDate();
+      deleteShiftsByDate(normalisedDate);
+    });
+  }
 }
 
 function init() {
@@ -238,6 +255,7 @@ function init() {
   wageInput = form.querySelector('[data-shift-wage]');
   submitBtn = form.querySelector('[data-shift-submit]');
   fetchBtn = form.querySelector('[data-shift-fetch]');
+  deleteBtn = form.querySelector('[data-shift-delete]');
   statusNode = document.querySelector('[data-shift-status]');
   tableBody = document.querySelector('[data-shift-table-body]');
 
@@ -263,6 +281,10 @@ document.addEventListener('partials:ready', init);
 
 async function deleteShiftsByDate(date) {
   const normalised = normaliseDateInputValue(date);
+  if (!normalised) {
+    setStatus('Ungültiges Datum zum Löschen.', true);
+    return;
+  }
   const query = normalised ? `?datum=${encodeURIComponent(normalised)}` : '';
   try {
     const response = await fetch(`${API_BASE}${query}`, {
