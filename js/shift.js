@@ -50,7 +50,8 @@ function parseDate(value) {
     day = Number(dashMatch[3]);
   }
 
-  const parsed = new Date(year, month - 1, day);
+  // Verwende UTC-Mittag, um Zeitzonenverschiebung zu vermeiden
+  const parsed = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
@@ -144,18 +145,18 @@ function ensureDay(entry) {
 function normaliseDateInputValue(value) {
   const parsed = parseDate(value);
   if (!parsed) return '';
-  const dd = String(parsed.getDate()).padStart(2, '0');
-  const mm = String(parsed.getMonth() + 1).padStart(2, '0');
-  const yyyy = String(parsed.getFullYear());
+  const dd = String(parsed.getUTCDate()).padStart(2, '0');
+  const mm = String(parsed.getUTCMonth() + 1).padStart(2, '0');
+  const yyyy = String(parsed.getUTCFullYear());
   return `${dd}.${mm}.${yyyy}`;
 }
 
 function normaliseApiDate(value) {
   const parsed = parseDate(value);
   if (!parsed) return value || '';
-  const dd = String(parsed.getDate()).padStart(2, '0');
-  const mm = String(parsed.getMonth() + 1).padStart(2, '0');
-  const yyyy = String(parsed.getFullYear());
+  const dd = String(parsed.getUTCDate()).padStart(2, '0');
+  const mm = String(parsed.getUTCMonth() + 1).padStart(2, '0');
+  const yyyy = String(parsed.getUTCFullYear());
   return `${dd}.${mm}.${yyyy}`;
 }
 
