@@ -1,7 +1,6 @@
 :root {
   --max-width: 720px;
 }
-
 *,
 *::before,
 *::after {
@@ -9,20 +8,24 @@
 }
 
 body {
-  margin: 0 auto;
-  padding: 2rem 1rem 4rem;
-  max-width: var(--max-width);
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   line-height: 1.6;
   background: #fff;
   color: #000;
 }
 
+main {
+  width: min(90%, var(--max-width));
+  margin: 0 auto 2rem;
+}
+
 header,
 nav,
-main,
-section,
-footer {
+section {
   margin-bottom: 2rem;
 }
 
@@ -41,6 +44,10 @@ a:focus-visible {
   text-align: center;
   padding-bottom: 1.5rem;
   border-bottom: 1px solid #000;
+}
+
+.site-top {
+  margin-bottom: 2rem;
 }
 
 .site-title {
@@ -89,7 +96,14 @@ a:focus-visible {
 .intro-main {
   display: flex;
   flex-direction: column;
-  /* margin-bottom: 2.5rem;*/
+  gap: 0.75rem;
+}
+
+.intro-main__links {
+  margin: 0;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .intro-main__title {
@@ -175,6 +189,63 @@ button:focus-visible {
 .status-meta {
   margin: 0 0 1rem;
   font-size: 0.95rem;
+}
+
+.shift-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.shift-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+}
+
+.shift-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.shift-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.shift-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.shift-status {
+  margin: 0;
+  min-height: 1.25rem;
+  font-size: 0.95rem;
+}
+
+.shift-status--error {
+  font-style: italic;
+}
+
+.shift-table-container {
+  overflow-x: auto;
+}
+
+.shift-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.shift-table th,
+.shift-table td {
+  padding: 0.5rem;
+  border: 1px solid #000;
 }
 
 /* Einstellungen */
@@ -307,7 +378,8 @@ footer {
   text-align: center;
   font-size: 0.9rem;
   border-top: 1px solid #000;
-  padding-top: 2rem;
+  padding: 1.5rem 1rem;
+  margin-top: auto;
 }
 
 /* RSS Feed */
@@ -337,4 +409,11 @@ footer {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+}
+.settings-modal__intro,
+.settings-form__label,
+.settings-form__hint,
+.settings-feedback,
+.settings-login-feedback {
+  margin: 0;
 }

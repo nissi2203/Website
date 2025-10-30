@@ -17,6 +17,12 @@ const defaultSettings = {
 
 const maintenanceJsonPath = '/maintenance.json';
 
+const PARTIAL_SOURCES = {
+  header: '/partials/header.html',
+  footer: '/partials/footer.html',
+  settings: '/partials/settings.html',
+};
+
 const statusConfig = {
   endpoint: '/status.json',
   containerSelector: '#status',
@@ -30,6 +36,35 @@ let tabsInitialised = false;
 let settingsOverlayRoot = null;
 let settingsTriggerButton = null;
 let loginOverlayRoot = null;
+
+async function loadPartials() {
+  const placeholders = Array.from(document.querySelectorAll('[data-include]'));
+  if (!placeholders.length) {
+    return;
+  }
+
+  await Promise.all(
+    placeholders.map(async (placeholder) => {
+      const name = placeholder.dataset.include;
+      const url = PARTIAL_SOURCES[name];
+      if (!url) {
+        return;
+      }
+
+      try {
+        const response = await fetch(url, { cache: 'no-store' });
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const markup = await response.text();
+        placeholder.outerHTML = markup;
+      } catch (error) {
+        console.warn(`Konnte Partials "${name}" nicht laden:`, error);
+      }
+    }),
+  );
+}
 
 // Hilfsfunktionen: Einstellungen & Authentifizierung ---------------------------------
 
@@ -758,4 +793,8 @@ function initSite() {
   insertCurrentYear();
 }
 
-document.addEventListener('DOMContentLoaded', initSite);
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadPartials();
+  document.dispatchEvent(new Event('partials:ready'));
+  initSite();
+});
