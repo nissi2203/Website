@@ -153,6 +153,19 @@ function renderTable(entries) {
       row.append(cell);
     });
 
+    const deleteCell = document.createElement('td');
+    const deleteButton = document.createElement('button');
+    deleteButton.type = 'button';
+    deleteButton.textContent = 'Löschen';
+    deleteButton.className = 'shift-table__delete';
+    if (entry.id) {
+      deleteButton.addEventListener('click', () => deleteShift(entry.id));
+    } else {
+      deleteButton.disabled = true;
+    }
+    deleteCell.append(deleteButton);
+    row.append(deleteCell);
+
     tableBody.append(row);
   });
 }
@@ -205,3 +218,20 @@ if (document.readyState !== 'loading') {
 }
 
 document.addEventListener('partials:ready', init);
+
+async function deleteShift(id) {
+  try {
+    const response = await fetch(`${API_BASE}/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      throw new Error(`Fehler ${response.status}`);
+    }
+
+    setStatus('Schicht gelöscht.');
+    await fetchShifts();
+  } catch (error) {
+    setStatus(`Fehler beim Löschen: ${error.message}`, true);
+  }
+}
