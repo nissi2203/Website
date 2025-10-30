@@ -45,9 +45,9 @@ function parseDate(value) {
     if (!dashMatch) {
       return null;
     }
-    year = Number(dashMatch[1]);
+    day = Number(dashMatch[1]);
     month = Number(dashMatch[2]);
-    day = Number(dashMatch[3]);
+    year = Number(dashMatch[3]);
   }
 
   // Verwende UTC-Mittag, um Zeitzonenverschiebung zu vermeiden
