@@ -145,18 +145,18 @@ function ensureDay(entry) {
 function normaliseDateInputValue(value) {
   const parsed = parseDate(value);
   if (!parsed) return '';
-  const dd = String(parsed.getUTCDate()).padStart(2, '0');
-  const mm = String(parsed.getUTCMonth() + 1).padStart(2, '0');
-  const yyyy = String(parsed.getUTCFullYear());
+  const dd = String(parsed.getDate()).padStart(2, '0');
+  const mm = String(parsed.getMonth() + 1).padStart(2, '0');
+  const yyyy = String(parsed.getFullYear());
   return `${dd}.${mm}.${yyyy}`;
 }
 
 function normaliseApiDate(value) {
   const parsed = parseDate(value);
   if (!parsed) return value || '';
-  const dd = String(parsed.getUTCDate()).padStart(2, '0');
-  const mm = String(parsed.getUTCMonth() + 1).padStart(2, '0');
-  const yyyy = String(parsed.getUTCFullYear());
+  const dd = String(parsed.getDate()).padStart(2, '0');
+  const mm = String(parsed.getMonth() + 1).padStart(2, '0');
+  const yyyy = String(parsed.getFullYear());
   return `${dd}.${mm}.${yyyy}`;
 }
 
