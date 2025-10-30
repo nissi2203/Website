@@ -132,6 +132,11 @@ function normaliseApiDate(value) {
     const yy = String(year).slice(-2);
     return `${dd}.${mm}.${yy}`;
   }
+  if (value.length === 10 && value.charAt(2) === '.') {
+    const [dd, mm, yyyy] = value.split('.');
+    const yy = String(yyyy).slice(-2);
+    return `${dd}.${mm}.${yy}`;
+  }
   return value;
 }
 
