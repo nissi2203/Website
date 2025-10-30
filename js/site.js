@@ -15,6 +15,8 @@ const defaultSettings = {
   maintenanceMessage: 'Wir spielen gerade Updates ein. Die Seite lädt automatisch neu, sobald alles wieder erreichbar ist.',
 };
 
+const maintenanceJsonPath = '/maintenance.json';
+
 const statusConfig = {
   endpoint: '/status.json',
   containerSelector: '#status',
@@ -49,6 +51,7 @@ function loadSiteSettings() {
 function saveSiteSettings(partialUpdate) {
   siteSettings = { ...siteSettings, ...partialUpdate };
   localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(siteSettings));
+  syncMaintenanceJson();
   updateSettingsForms();
   updateMaintenanceMessage();
   enforceMaintenanceState();
@@ -121,8 +124,28 @@ function enforceMaintenanceState() {
 function onStorageSync(event) {
   if (event.key === STORAGE_KEYS.settings) {
     siteSettings = loadSiteSettings();
+    syncMaintenanceJson();
     updateSettingsForms();
     enforceMaintenanceState();
+  }
+}
+
+async function syncMaintenanceJson() {
+  const maintenanceData = {
+    enabled: Boolean(siteSettings.maintenanceEnabled),
+    message: siteSettings.maintenanceMessage || defaultSettings.maintenanceMessage,
+  };
+
+  try {
+    await fetch(maintenanceJsonPath, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(maintenanceData, null, 2),
+    });
+  } catch (error) {
+    console.warn('maintenance.json konnte nicht aktualisiert werden:', error);
   }
 }
 
