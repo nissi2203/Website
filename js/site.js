@@ -168,6 +168,13 @@ function parseStatusData(data) {
     return data.services;
   }
 
+  if (data.services && typeof data.services === 'object') {
+    return Object.entries(data.services).map(([name, statusValue]) => ({
+      name,
+      status: statusValue,
+    }));
+  }
+
   return [];
 }
 
