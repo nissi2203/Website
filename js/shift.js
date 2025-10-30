@@ -50,13 +50,13 @@ function parseDate(value) {
     day = Number(dashMatch[3]);
   }
 
-  // Verwende UTC, um Zeitzonenverschiebung zu vermeiden
-  const parsed = new Date(Date.UTC(year, month - 1, day));
+  // Erstelle Datum im lokalen Kontext
+  const parsed = new Date(year, month - 1, day);
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
 function formatWeekday(date) {
-  return new Intl.DateTimeFormat('de-DE', { weekday: 'long', timeZone: 'UTC' }).format(date);
+  return new Intl.DateTimeFormat('de-DE', { weekday: 'long' }).format(date);
 }
 
 function updateDayFromDate() {
@@ -118,6 +118,12 @@ async function submitShift() {
     lohn: Number((normaliseNumber(hoursInput.value) * HOURLY_WAGE).toFixed(2)),
   };
 
+  // Datum für SQL-kompatibles Format (YYYY-MM-DD) umwandeln
+  if (payload.datum && payload.datum.includes('.')) {
+    const [day, month, year] = payload.datum.split('.');
+    payload.datum = `${year}-${month}-${day}`;
+  }
+
   try {
     const response = await fetch(API_BASE, {
       method: 'POST',
@@ -145,18 +151,18 @@ function ensureDay(entry) {
 function normaliseDateInputValue(value) {
   const parsed = parseDate(value);
   if (!parsed) return '';
-  const dd = String(parsed.getUTCDate()).padStart(2, '0');
-  const mm = String(parsed.getUTCMonth() + 1).padStart(2, '0');
-  const yyyy = String(parsed.getUTCFullYear());
+  const dd = String(parsed.getDate()).padStart(2, '0');
+  const mm = String(parsed.getMonth() + 1).padStart(2, '0');
+  const yyyy = String(parsed.getFullYear());
   return `${dd}.${mm}.${yyyy}`;
 }
 
 function normaliseApiDate(value) {
   const parsed = parseDate(value);
   if (!parsed) return value || '';
-  const dd = String(parsed.getUTCDate()).padStart(2, '0');
-  const mm = String(parsed.getUTCMonth() + 1).padStart(2, '0');
-  const yyyy = String(parsed.getUTCFullYear());
+  const dd = String(parsed.getDate()).padStart(2, '0');
+  const mm = String(parsed.getMonth() + 1).padStart(2, '0');
+  const yyyy = String(parsed.getFullYear());
   return `${dd}.${mm}.${yyyy}`;
 }
 
