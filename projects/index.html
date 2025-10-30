@@ -7,33 +7,134 @@
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-  <!-- Einfacher Seitenkopf mit Name und Kurzbeschreibung -->
-  <header class="site-header">
-    <h1 class="site-title"><a class="site-title__link" href="/">Dyonisos Fergadiotis</a></h1>
-    <p class="site-subtitle">Informatikstudent · TU Dortmund · Automation &amp; Tech-Komfort</p>
-  </header>
+  <div class="site-top">
+    <!-- Einfacher Seitenkopf mit Name und Kurzbeschreibung -->
+    <header class="site-header">
+      <h1 class="site-title"><a class="site-title__link" href="/">Dyonisos Fergadiotis</a></h1>
+      <p class="site-subtitle">Informatikstudent · Automatisierung · Smart Home</p>
+    </header>
 
-  <!-- Navigation zu den Unterseiten -->
-  <nav class="site-nav" aria-label="Hauptnavigation">
-    <ul class="site-nav__list">
-      <li><a class="site-nav__link" href="/projects/">Projekte</a></li>
-      <li><a class="site-nav__link" href="/tools/">Tools</a></li>
-      <li><a class="site-nav__link" href="/cv/">CV</a></li>
-      <li><a class="site-nav__link" href="/status/">Status</a></li>
-    </ul>
-  </nav>
+    <!-- Navigation zu den Unterseiten -->
+    <nav class="site-nav" aria-label="Hauptnavigation">
+      <ul class="site-nav__list">
+        <li><a class="site-nav__link" href="/projects/">Projekte</a></li>
+        <li><a class="site-nav__link" href="/tools/">Tools</a></li>
+        <li><a class="site-nav__link" href="/cv/">Profil</a></li>
+        <li><a class="site-nav__link" href="/status/">Status</a></li>
+      </ul>
+    </nav>
+  </div>
 
   <main>
-    <!-- Seitenüberschrift -->
     <header class="page-header">
       <h1 class="page-title">Projekte</h1>
       <p class="page-intro">Hier sammle ich Smart-Home-Setups, Raspberry-Pi-Experimente und Automatisierungen.</p>
     </header>
-    <!-- Platzhalter für späteren Inhalt -->
-    <section class="content-shell">
-      <p>Hier kommen später meine Projekte und Setups.</p>
+
+    <section class="content-shell project-upcoming" aria-labelledby="upcoming-title">
+      <h2 class="project-upcoming__title" id="upcoming-title">Upcoming</h2>
+      <ol class="project-upcoming__list">
+        <li>Direkte API-Anbindung an Uptime Kuma für Live-Metriken.</li>
+        <li>Feinschliff am Design – mehr Ruhe, mehr Konsistenz.</li>
+        <li>Profil-Seite klar strukturieren: Kurzprofil, Skills, Erfahrung.</li>
+        <li>Tools nach Kategorien ordnen und mit Kurzbeschreibungen versehen.</li>
+        <li>Wartungsfenster im UI konfigurierbar machen – inkl. Start/Stopp.</li>
+      </ol>
     </section>
   </main>
+
+  <button class="settings-fab" type="button" data-settings-trigger aria-label="Einstellungen öffnen">
+    <span class="settings-fab__icon" aria-hidden="true">⚙</span>
+  </button>
+
+  <div class="settings-overlay" data-settings-overlay hidden>
+    <div class="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <div class="settings-modal__header">
+        <h2 class="settings-modal__title" id="settings-title">Einstellungen</h2>
+        <button class="settings-modal__close" type="button" data-settings-close aria-label="Schließen">×</button>
+      </div>
+      <p class="settings-modal__intro">
+        Wartungsmodus und Passwort gelten nur für diesen Browser. Änderungen sind sofort aktiv.
+      </p>
+      <form class="settings-form" data-settings-maintenance>
+        <div class="settings-switch">
+          <label class="settings-switch__label">
+            <input type="checkbox" class="settings-switch__input" data-settings-maintenance-toggle>
+            <span>Wartungsmodus aktivieren</span>
+          </label>
+        </div>
+        <label class="settings-form__label" for="maintenance-message">Hinweistext</label>
+        <textarea
+          class="settings-form__input settings-form__textarea"
+          id="maintenance-message"
+          rows="3"
+          data-settings-maintenance-message
+        ></textarea>
+        <div class="settings-form__actions">
+          <button class="settings-form__button" type="submit">Status speichern</button>
+        </div>
+      </form>
+      <div class="settings-modal__separator" aria-hidden="true"></div>
+      <form class="settings-form" data-settings-password>
+        <h3 class="settings-subtitle">Passwort ändern</h3>
+        <label class="settings-form__label" for="settings-current-password">Aktuelles Passwort</label>
+        <input
+          class="settings-form__input"
+          type="password"
+          id="settings-current-password"
+          autocomplete="current-password"
+          data-settings-current-password
+          required
+        >
+        <label class="settings-form__label" for="settings-new-password">Neues Passwort</label>
+        <input
+          class="settings-form__input"
+          type="password"
+          id="settings-new-password"
+          autocomplete="new-password"
+          data-settings-new-password
+          required
+        >
+        <label class="settings-form__label" for="settings-confirm-password">Bestätigung</label>
+        <input
+          class="settings-form__input"
+          type="password"
+          id="settings-confirm-password"
+          autocomplete="new-password"
+          data-settings-confirm-password
+          required
+        >
+        <div class="settings-form__actions">
+          <button class="settings-form__button" type="submit">Passwort sichern</button>
+        </div>
+      </form>
+      <p class="settings-feedback" aria-live="polite" data-settings-feedback></p>
+    </div>
+  </div>
+
+  <div class="settings-login-overlay" data-settings-login-overlay hidden>
+    <div class="settings-login-modal" role="dialog" aria-modal="true" aria-labelledby="settings-login-title">
+      <div class="settings-login-header">
+        <h2 class="settings-login-title" id="settings-login-title">Passwort erforderlich</h2>
+        <button class="settings-login-close" type="button" data-settings-login-close aria-label="Abbrechen">×</button>
+      </div>
+      <form class="settings-login-form" data-settings-login>
+        <label class="settings-form__label" for="settings-login-password">Passwort</label>
+        <div class="settings-form__row">
+          <input
+            class="settings-form__input"
+            type="password"
+            id="settings-login-password"
+            autocomplete="current-password"
+            required
+          >
+          <button class="settings-form__button" type="submit">Bestätigen</button>
+        </div>
+        <p class="settings-form__hint">Standard: <code>mintglass</code></p>
+      </form>
+      <p class="settings-login-feedback" data-settings-login-feedback aria-live="polite"></p>
+    </div>
+  </div>
 
   <!-- Footer mit automatisch gesetztem Jahr -->
   <footer class="site-footer">
