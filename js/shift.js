@@ -73,8 +73,16 @@ function normaliseNumber(value) {
 }
 
 async function submitShift() {
+  const normalisedDate = normaliseDateInputValue(dateInput.value);
+  if (normalisedDate) {
+    dateInput.value = normalisedDate;
+  }
+  const parsedDate = parseDate(normalisedDate || dateInput.value);
+  const tag = parsedDate ? formatWeekday(parsedDate) : '';
+
   const payload = {
     datum: dateInput.value,
+    tag,
     start: startInput.value,
     ende: endInput.value,
     pause: breakInput.value,
@@ -106,15 +114,42 @@ function ensureDay(entry) {
   return date ? formatWeekday(date) : '';
 }
 
+function normaliseDateInputValue(value) {
+  const parsed = parseDate(value);
+  if (!parsed) return '';
+  const dd = String(parsed.getDate()).padStart(2, '0');
+  const mm = String(parsed.getMonth() + 1).padStart(2, '0');
+  const yy = String(parsed.getFullYear()).slice(-2);
+  return `${dd}.${mm}.${yy}`;
+}
+
+function normaliseApiDate(value) {
+  if (!value) return '';
+  if (value.includes('-')) {
+    const [year, month, day] = value.split('-');
+    const dd = day.padStart(2, '0');
+    const mm = month.padStart(2, '0');
+    const yy = String(year).slice(-2);
+    return `${dd}.${mm}.${yy}`;
+  }
+  return value;
+}
+
 async function fetchShifts() {
   try {
-    const query = dateInput.value ? `?datum=${encodeURIComponent(dateInput.value)}` : '';
+    const normalisedFilterDate = normaliseDateInputValue(dateInput.value);
+    if (normalisedFilterDate) {
+      dateInput.value = normalisedFilterDate;
+    }
+    const query = normalisedFilterDate ? `?datum=${encodeURIComponent(normalisedFilterDate)}` : '';
     const response = await fetch(`${API_BASE}${query}`);
     if (!response.ok) {
       throw new Error(`Fehler ${response.status}`);
     }
     const data = await response.json();
-    renderTable(Array.isArray(data) ? data : []);
+    const list = Array.isArray(data) ? data.map((entry) => ({ ...entry, datum: normaliseApiDate(entry.datum) })) : [];
+    renderTable(list);
+    updateDayFromDate();
     setStatus('Schichten aktualisiert.');
   } catch (error) {
     setStatus(`Fehler beim Abrufen: ${error.message}`, true);
@@ -137,8 +172,9 @@ function renderTable(entries) {
 
   entries.forEach((entry) => {
     const row = document.createElement('tr');
+    const displayDatum = normaliseApiDate(entry.datum);
     const cells = [
-      entry.datum,
+      displayDatum,
       ensureDay(entry),
       entry.start,
       entry.ende,
@@ -156,10 +192,10 @@ function renderTable(entries) {
     const deleteCell = document.createElement('td');
     const deleteButton = document.createElement('button');
     deleteButton.type = 'button';
-    deleteButton.textContent = 'Löschen';
+    deleteButton.textContent = '🗑️ Löschen';
     deleteButton.className = 'shift-table__delete';
-    if (entry.id) {
-      deleteButton.addEventListener('click', () => deleteShift(entry.id));
+    if (displayDatum) {
+      deleteButton.addEventListener('click', () => deleteShiftsByDate(displayDatum));
     } else {
       deleteButton.disabled = true;
     }
@@ -219,9 +255,11 @@ if (document.readyState !== 'loading') {
 
 document.addEventListener('partials:ready', init);
 
-async function deleteShift(id) {
+async function deleteShiftsByDate(date) {
+  const normalised = normaliseDateInputValue(date);
+  const query = normalised ? `?datum=${encodeURIComponent(normalised)}` : '';
   try {
-    const response = await fetch(`${API_BASE}/${encodeURIComponent(id)}`, {
+    const response = await fetch(`${API_BASE}${query}`, {
       method: 'DELETE',
     });
 
@@ -229,7 +267,7 @@ async function deleteShift(id) {
       throw new Error(`Fehler ${response.status}`);
     }
 
-    setStatus('Schicht gelöscht.');
+    setStatus('Schichten gelöscht.');
     await fetchShifts();
   } catch (error) {
     setStatus(`Fehler beim Löschen: ${error.message}`, true);
