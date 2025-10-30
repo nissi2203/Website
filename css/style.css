@@ -231,6 +231,72 @@ a:focus {
   font-size: 0.95rem;
 }
 
+/* Status-Hinweistext: <p class="status-hint"> */
+.status-hint {
+  margin: 0;
+  font-size: 0.95rem;
+  opacity: 0.8;
+}
+
+/* Status-Fehlertext: <p class="status-hint status-error"> */
+.status-error {
+  color: #e57373;
+  opacity: 1;
+}
+
+/* Statusliste: <div class="status-list"> */
+.status-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+}
+
+/* Status-Item: <div class="status-item"> */
+.status-item {
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  background: rgba(255, 255, 255, 0.65);
+}
+
+@media (prefers-color-scheme: dark) {
+  .status-item {
+    background: rgba(26, 26, 26, 0.85);
+  }
+}
+
+/* Status-Name: <span class="status-item__name"> */
+.status-item__name {
+  font-weight: 600;
+}
+
+/* Status-Details: <span class="status-item__details"> */
+.status-item__details {
+  font-size: 0.95rem;
+  opacity: 0.85;
+}
+
+/* Zustand-Markierungen per Klasse */
+.status-online {
+  border-left: 4px solid #81C784;
+  padding-left: calc(1rem - 4px);
+}
+
+.status-offline {
+  border-left: 4px solid #e57373;
+  padding-left: calc(1rem - 4px);
+}
+
+.status-maintenance {
+  border-left: 4px solid #ffb74d;
+  padding-left: calc(1rem - 4px);
+}
+
 /* CV-Sektion: <section class="cv-section"> */
 .cv-section {
   margin-bottom: 2rem;
