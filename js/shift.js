@@ -158,6 +158,13 @@ function normaliseDateInputValue(value) {
 }
 
 function normaliseApiDate(value) {
+  if (!value) return '';
+  // Wenn das Format YYYY-MM-DD ist, direkt umwandeln
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const [year, month, day] = value.split('-');
+    return `${day}.${month}.${year}`;
+  }
+  // Andernfalls Standardverhalten
   const parsed = parseDate(value);
   if (!parsed) return value || '';
   const dd = String(parsed.getDate()).padStart(2, '0');
