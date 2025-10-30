@@ -51,7 +51,7 @@ function parseDate(value) {
   }
 
   // Verwende UTC-Mittag, um Zeitzonenverschiebung zu vermeiden
-  const parsed = new Date(Date.UTC(day, month - 1, year, 12, 0, 0));
+  const parsed = new Date(""+day + (month - 1) + year, 12, 0, 0);
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
