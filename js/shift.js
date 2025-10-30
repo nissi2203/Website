@@ -56,7 +56,7 @@ function parseDate(value) {
 }
 
 function formatWeekday(date) {
-  return date.toLocaleDateString('de-DE', { weekday: 'long' });
+  return new Intl.DateTimeFormat('de-DE', { weekday: 'long', timeZone: 'UTC' }).format(date);
 }
 
 function updateDayFromDate() {
