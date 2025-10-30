@@ -34,9 +34,9 @@ function parseDate(value) {
 
   const dotMatch = base.match(/^(\d{1,2})\.(\d{1,2})\.(\d{2}|\d{4})$/);
   if (dotMatch) {
-    day = Number(dotMatch[1]);
+    year = Number(dotMatch[1]);
     month = Number(dotMatch[2]);
-    year = Number(dotMatch[3]);
+    day = Number(dotMatch[3])+1;
     if (year < 100) {
       year += 2000;
     }
@@ -45,9 +45,9 @@ function parseDate(value) {
     if (!dashMatch) {
       return null;
     }
-    day = Number(dashMatch[1]);
+    year = Number(dashMatch[1]);
     month = Number(dashMatch[2]);
-    year = Number(dashMatch[3]);
+    day = Number(dashMatch[3]);
   }
 
   // Verwende UTC-Mittag, um Zeitzonenverschiebung zu vermeiden
