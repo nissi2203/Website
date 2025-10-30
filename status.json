@@ -1,9 +1,11 @@
 {
-  "last_update": "2025-10-29T23:45:21Z",
+  "last_update": "2025-10-30T00:40:01Z",
   "services": {
-    "Home Assistant": "online",
-    "Pi-hole": "online",
-    "MQTT": "offline",
-    "Uptime Kuma": "online"
-  }
+  "HomeAssistant": "online",
+  "Zigbee2MQTT": "online",
+  "MQTT": "online",
+  "Pi.Hole": "online",
+  "CUPS": "online",
+  "HomeBridge": "online"
+}
 }
