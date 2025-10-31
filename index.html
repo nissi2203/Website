@@ -1,65 +1,169 @@
-<html>
-
+<!DOCTYPE html>
+<html lang="de">
 <head>
-    <title>Dyonisos Fergadiotis</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/stylesheet.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dyonisos Fergadiotis · Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&family=Sora:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/stylesheet.css">
 </head>
-
 <body>
-    <nav class="header">
-        <div class="left_header">
-            <header>Dyonisos Fergadiotis</header>
-            <h2 style="color:#2E8B77">Informatikstudent · TU Dortmund</h2>
+    <!-- --- Navigation --- -->
+    <nav class="site-nav">
+        <div class="logo">
+            <a href="#home" class="brand">Dyonisos Fergadiotis</a>
         </div>
-        <div class="right_header">
-
+        <button class="nav-toggle" aria-label="Menü öffnen">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <div class="nav-links">
+            <a href="#home">Home</a>
+            <a href="#projects">Projects</a>
+            <a href="#education">Education</a>
+            <a href="#about">About</a>
+            <a href="#contact">Contact</a>
         </div>
     </nav>
 
-    <div class="content">
-
-        <div id="row">
-
-            <div class="text_bio" id="content_l">
-                <h3>Biografie/Kurztext </h3>
-                <p>
-                    Lorem ipsum dolor sit amet tellus ornare vel arcu aliqua blandit in condimentum enim.
-                    Faucibus turpis hendrerit cras vestibulum proin aenean praesent.
-                </p>
+    <main>
+        <!-- --- Hero Section --- -->
+        <section id="home" class="hero">
+            <div class="hero-content">
+                <p class="eyebrow">Hallo, ich bin</p>
+                <h1>Dyonisos Fergadiotis</h1>
+                <p class="lead">Informatikstudent an der TU Dortmund mit einer Vorliebe für ruhige Interfaces, ehrliche Prozesse und menschliche Software.</p>
             </div>
-
-            <div class="aufzahlung_projekte" id="content_r">
-                <h3>Projekte</h3>
-                <ul>
-                    <li>avus</li>
-                    <li>monet</li>
-                    <li>quia</li>
-                </ul>
+            <div class="hero-media" aria-hidden="true">
+                <div class="hero-avatar">
+                    <span class="glow"></span>
+                </div>
+                <p class="hero-caption">„Indie heißt für mich, ruhig zu bauen, ehrlich zu shippen und Menschen in den Mittelpunkt zu stellen.“</p>
             </div>
-        </div>
+        </section>
 
-        <div id="row">
-        <div class="aufzahlung_cv" id="content_l">
-            <h3>Curriculum Vitae</h3>
-            <ul>
-                <li>lorem</li>
-                <li>ipsum</li>
-            </ul>
-        </div>
-        </div>
-        <footer>
-            <p>© 2025 Dyonisos Fergadiotis · Alle Rechte vorbehalten</p>
-            <div class="contacts">
-                <p>
-                    <a href="mailto:dyonisos@example.com">E-Mail</a> ·
-                    <a href="https://github.com/dyonisosfergadiotis">GitHub</a> ·
-                    <a href="https://www.linkedin.com/in/dyonisosfergadiotis/">LinkedIn</a>
-                </p>
+        <!-- --- Projects --- -->
+        <section id="projects" class="projects">
+            <header class="section-header">
+                <span class="section-tag">Projects</span>
+                <h2>Handgemachte Projekte mit Indie-Touch</h2>
+                <p>Kuratiert aus Studienarbeiten, Freelance-Collabs und persönlichen Spielplätzen für mutige Ideen.</p>
+            </header>
+            <div class="project-grid">
+                <article class="card">
+                    <div class="card-meta">2024 · Web App</div>
+                    <h3>Projektname Eins</h3>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas tempus justo vitae sapien posuere.</p>
+                    <a class="card-link" href="#!">Details folgen</a>
+                </article>
+                <article class="card">
+                    <div class="card-meta">2023 · Research</div>
+                    <h3>Projektname Zwei</h3>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer mollis lacinia dui sed fermentum.</p>
+                    <a class="card-link" href="#!">Details folgen</a>
+                </article>
+                <article class="card">
+                    <div class="card-meta">2022 · Tooling</div>
+                    <h3>Projektname Drei</h3>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent congue lacinia dui, sit amet dapibus velit.</p>
+                    <a class="card-link" href="#!">Details folgen</a>
+                </article>
             </div>
-        </footer>
-        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-        <script src="js/nav_scroll.js"></script>
+        </section>
+
+        <!-- --- Education --- -->
+        <section id="education" class="education">
+            <header class="section-header">
+                <span class="section-tag">Education</span>
+                <h2>Wissen mit Praxis verknüpft</h2>
+                <p>Ich mag es, wenn Theorie nicht isoliert steht, sondern schnell in Prototypen, Texturen oder Talks einfließt.</p>
+            </header>
+            <div class="timeline">
+                <article class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <span class="timeline-year">seit 2021</span>
+                        <h3>Lorem Ipsum Studium</h3>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti vivamus sed.</p>
+                    </div>
+                </article>
+                <article class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <span class="timeline-year">2023</span>
+                        <h3>Lorem Ipsum Werkstudium</h3>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas id rhoncus turpis vitae.</p>
+                    </div>
+                </article>
+                <article class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <span class="timeline-year">2019–2021</span>
+                        <h3>Lorem Ipsum Ausbildung</h3>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque nibh ante, mattis eget.</p>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- --- About --- -->
+        <section id="about" class="about">
+            <header class="section-header">
+                <span class="section-tag">About</span>
+                <h2>Hi, ich bin Dyonisos</h2>
+            </header>
+            <div class="about-wrapper">
+                <div class="about-text">
+                    <p>Ich liebe es, wenn Produkte so still sind, dass man ihnen vertraut. Indie-Tech bedeutet für mich schlanke Prozesse, neugierige Prototypen und empathische Kommunikation. Ich plane gern mit Notion, skizziere mit Stiften und shippe mit Liebe zum Detail.</p>
+                    <p>Aktuell fokussiere ich mich auf Tools, die Lernprozesse vereinfachen, Daten zugänglicher machen und Teams helfen, schneller zu iterieren. Meine Arbeit ist ruhig, aber ziemlich hartnäckig.</p>
+                </div>
+                <aside class="about-highlights">
+                    <div class="highlight-card">
+                        <span class="highlight-title">Skills Snapshot</span>
+                        <ul>
+                            <li>UX Research & Story Mapping</li>
+                            <li>TypeScript · React · Vite</li>
+                            <li>Node.js Edge APIs · Supabase</li>
+                        </ul>
+                    </div>
+                    <div class="highlight-card">
+                        <span class="highlight-title">Aktuelles Interesse</span>
+                        <ul>
+                            <li>Calm Interfaces für Lernplattformen</li>
+                            <li>Lokale Datenspeicherung & Offline-first</li>
+                            <li>Zwischenräume zwischen Musik & Code</li>
+                        </ul>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <!-- --- Contact --- -->
+        <section id="contact" class="contact">
+            <header class="section-header">
+                <span class="section-tag">Contact</span>
+                <h2>Lass uns zusammen etwas Leises bauen</h2>
+                <p>Ob Projekt, Austausch oder einfach ein Kaffee – ich freue mich auf neue Indie-Menschen.</p>
+            </header>
+            <div class="contact-links">
+                <a class="btn" href="mailto:dyonisos@example.com">Schreib mir eine Mail</a>
+                <a class="link-ghost" href="https://www.linkedin.com/in/dyonisosfergadiotis/" target="_blank" rel="noreferrer">LinkedIn</a>
+                <a class="link-ghost" href="https://github.com/dyonisosfergadiotis" target="_blank" rel="noreferrer">GitHub</a>
+            </div>
+        </section>
+    </main>
+
+    <!-- --- Footer --- -->
+    <footer class="site-footer">
+        <p>© <span id="current-year"></span> Dyonisos Fergadiotis</p>
+        <div class="footer-links">
+            <a href="mailto:dyonisos@example.com">Mail</a>
+            <a href="https://github.com/dyonisosfergadiotis" target="_blank" rel="noreferrer">GitHub</a>
+            <a href="https://www.linkedin.com/in/dyonisosfergadiotis/" target="_blank" rel="noreferrer">LinkedIn</a>
+        </div>
+    </footer>
+
+    <script src="js/script.js" defer></script>
 </body>
-
 </html>
