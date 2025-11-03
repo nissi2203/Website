@@ -338,7 +338,7 @@ section {
     top: 0;
     bottom: 0;
     width: 2px;
-    background: linear-gradient(to bottom, rgba(0, 191, 166, 0.6), rgba(0, 191, 166, 0.05));
+    background: linear-gradient(to bottom,  rgba(0, 191, 166, 0.25), rgba(0, 191, 166, 0.6), rgba(0, 191, 166, 0.25));
 }
 
 .timeline-item {
@@ -356,8 +356,9 @@ section {
     border-radius: 50%;
     background: var(--bg-color);
     border: 3px solid var(--accent-color);
-    margin-top: 4px;
+    margin-top: 85px;
     box-shadow: 0 0 0 6px rgba(0, 191, 166, 0.12);
+    margin-left: -7px;
 }
 
 .timeline-content {
