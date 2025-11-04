@@ -359,6 +359,7 @@ section {
     position: relative;
     display: grid;
     gap: 28px;
+    margin-top: 28px;
 }
 
 .timeline::before {
@@ -409,6 +410,26 @@ section {
     text-transform: uppercase;
     color: var(--muted-color);
     margin-bottom: 12px;
+}
+
+.timeline-group + .timeline-group {
+    margin-top: 60px;
+}
+
+.timeline-header {
+    margin-bottom: 32px;
+}
+
+.timeline-header h3 {
+    font-size: 1.25rem;
+    letter-spacing: 0.4px;
+    margin-bottom: 12px;
+}
+
+.timeline-header p {
+    max-width: 720px;
+    margin: 0;
+    color: rgba(17, 17, 17, 0.78);
 }
 
 /* --- About --- */
