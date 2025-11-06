@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>App Showcase</title>
   <link rel="stylesheet" href="stylesheet.css">
   <link rel="apple-touch-icon" sizes="180x180" href="icon/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="icon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="icon/favicon-16x16.png">
-    <link rel="icon" type="image/x-icon" href="icon/favicon.ico">
-    <link rel="shortcut icon" href="icon/favicon.ico">
-    <link rel="manifest" href="icon/site.webmanifest">
+  <link rel="icon" type="image/png" sizes="32x32" href="icon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="icon/favicon-16x16.png">
+  <link rel="icon" type="image/x-icon" href="icon/favicon.ico">
+  <link rel="shortcut icon" href="icon/favicon.ico">
+  <link rel="manifest" href="icon/site.webmanifest">
 </head>
+
 <body>
   <div class="hero">
     <div class="hero-text">
@@ -35,19 +37,23 @@
     <div class="view-captions" aria-hidden="true">
       <div class="view-caption view-caption--left" data-screen-index="1">
         <span class="view-caption__eyebrow">Unread Feed</span>
-        <p class="view-caption__body">See every new notification in one stream, ordered latest first so nothing slips through.</p>
+        <p class="view-caption__body">See every new notification in one stream, ordered latest first so nothing slips
+          through.</p>
       </div>
       <div class="view-caption view-caption--right" data-screen-index="2">
         <span class="view-caption__eyebrow">Read Feed</span>
-        <p class="view-caption__body">Revisit what you already checked and jump straight back into conversations that matter.</p>
+        <p class="view-caption__body">Revisit what you already checked and jump straight back into conversations that
+          matter.</p>
       </div>
       <div class="view-caption view-caption--left" data-screen-index="3">
         <span class="view-caption__eyebrow">Search</span>
-        <p class="view-caption__body">Filter by teams, topics, or keywords to pinpoint the update you need in seconds.</p>
+        <p class="view-caption__body">Filter by teams, topics, or keywords to pinpoint the update you need in seconds.
+        </p>
       </div>
       <div class="view-caption view-caption--right" data-screen-index="4">
         <span class="view-caption__eyebrow">Settings</span>
-        <p class="view-caption__body">Tune delivery channels, quiet hours, and device sync so notifications match your flow.</p>
+        <p class="view-caption__body">Tune delivery channels, quiet hours, and device sync so notifications match your
+          flow.</p>
       </div>
     </div>
   </div>
@@ -55,438 +61,439 @@
   <footer class="site-footer">
     <p>&copy; <span id="footerYear"></span> Dyonisos Fergadiotis. All rights reserved.</p>
   </footer>
-<script>
-const phone = document.querySelector('.phone-container');
-const heroText = document.querySelector('.hero-text');
-const scrollSpace = document.querySelector('.scroll-space');
-const screenImages = Array.from(document.querySelectorAll('.app-screen'));
-const captionItems = Array.from(document.querySelectorAll('.view-caption'))
-  .map((el) => ({
-    el,
-    screenIndex: Number.parseInt(el.dataset.screenIndex ?? '-1', 10),
-  }))
-  .filter((item) => Number.isInteger(item.screenIndex) && item.screenIndex >= 0)
-  .sort((a, b) => a.screenIndex - b.screenIndex);
-const captionIndexSet = new Set(captionItems.map((item) => item.screenIndex));
-const footerYear = document.getElementById('footerYear');
+  <script>
+    const phone = document.querySelector('.phone-container');
+    const heroText = document.querySelector('.hero-text');
+    const scrollSpace = document.querySelector('.scroll-space');
+    const screenImages = Array.from(document.querySelectorAll('.app-screen'));
+    const captionItems = Array.from(document.querySelectorAll('.view-caption'))
+      .map((el) => ({
+        el,
+        screenIndex: Number.parseInt(el.dataset.screenIndex ?? '-1', 10),
+      }))
+      .filter((item) => Number.isInteger(item.screenIndex) && item.screenIndex >= 0)
+      .sort((a, b) => a.screenIndex - b.screenIndex);
+    const captionIndexSet = new Set(captionItems.map((item) => item.screenIndex));
+    const footerYear = document.getElementById('footerYear');
 
-const START_TRANSLATE_PERCENT = -10;
-const START_TRANSLATE_OFFSET = 75;
-const END_TRANSLATE_PERCENT = -50;
-const END_TRANSLATE_OFFSET = 0;
-const START_SCALE = 1;
-const END_SCALE = 0.6;
+    const START_TRANSLATE_PERCENT = -10;
+    const START_TRANSLATE_OFFSET = 75;
+    const END_TRANSLATE_PERCENT = -50;
+    const END_TRANSLATE_OFFSET = 0;
+    const START_SCALE = 1;
+    const END_SCALE = 0.6;
 
-const CAPTION_OFFSET_PERCENT = 42;
-const VIEW_HOLD_PORTION = 0.5;
-const VIEW_TRANSITION_PORTION = 0.35;
-const CAPTION_SHOW_DELAY = 0.12;
-const WHEEL_TRIGGER_DELTA = 100;
-const SCROLL_ANIMATION_DURATION = 420;
-const STEP_HYSTERESIS = 0.35;
+    const CAPTION_OFFSET_PERCENT = 42;
+    const VIEW_HOLD_PORTION = 0.5;
+    const VIEW_TRANSITION_PORTION = 0.35;
+    const CAPTION_SHOW_DELAY = 0.12;
+    const WHEEL_TRIGGER_DELTA = 100;
+    const SCROLL_ANIMATION_DURATION = 420;
+    const STEP_HYSTERESIS = 0.35;
 
-let segmentScroll = 400;
-let totalScroll = 1;
-let transformScroll = 1;
-let latestScrollY = window.scrollY;
-let ticking = false;
-let heroTextHidden = false;
-let maxStep = 0;
-let snapInProgress = false;
-let snapTarget = window.scrollY;
-let snapTimeoutId = null;
-let wheelDeltaBuffer = 0;
-let currentStepIndex = 0;
-let scrollAnimationFrame = null;
+    let segmentScroll = 400;
+    let totalScroll = 1;
+    let transformScroll = 1;
+    let latestScrollY = window.scrollY;
+    let ticking = false;
+    let heroTextHidden = false;
+    let maxStep = 0;
+    let snapInProgress = false;
+    let snapTarget = window.scrollY;
+    let snapTimeoutId = null;
+    let wheelDeltaBuffer = 0;
+    let currentStepIndex = 0;
+    let scrollAnimationFrame = null;
 
-if (phone) {
-  phone.style.willChange = 'transform';
-}
+    if (phone) {
+      phone.style.willChange = 'transform';
+    }
 
-screenImages.forEach((img, index) => {
-  img.style.opacity = index === 0 ? '1' : '0';
-});
-
-captionItems.forEach(({ el }) => {
-  el.style.opacity = '0';
-  el.style.transform = `translate3d(0, ${CAPTION_OFFSET_PERCENT}%, 0)`;
-});
-
-function recalcLayout() {
-  const viewportHeight = window.innerHeight || 800;
-  const segments = Math.max(screenImages.length - 1, 1);
-  segmentScroll = Math.max(viewportHeight * 1.25, 800);
-  totalScroll = segmentScroll * segments;
-  transformScroll = Math.min(segmentScroll, totalScroll);
-  maxStep = Math.max(screenImages.length - 1, 0);
-
-  if (scrollSpace) {
-    scrollSpace.style.height = `${Math.ceil(totalScroll + viewportHeight)}px`;
-  }
-
-  snapTarget = Math.max(0, Math.min(latestScrollY, totalScroll));
-  const approxStep = getStepForScroll(snapTarget);
-}
-
-function getSegmentState(progress, itemCount) {
-  const totalSegments = Math.max(itemCount - 1, 0);
-
-  if (totalSegments <= 0) {
-    return { index: 0, next: 0, local: 0, totalSegments };
-  }
-
-  if (progress >= 1) {
-    const last = totalSegments;
-    return { index: last, next: last, local: 1, totalSegments };
-  }
-
-  const clamped = Math.max(Math.min(progress, 0.999999), 0);
-  const raw = clamped * totalSegments;
-  const index = Math.floor(raw);
-  const local = raw - index;
-  return {
-    index,
-    next: Math.min(index + 1, totalSegments),
-    local,
-    totalSegments
-  };
-}
-
-function easeInOut(t) {
-  const clamped = Math.max(0, Math.min(1, t));
-  return clamped * clamped * (3 - 2 * clamped);
-}
-
-function applyPhoneTransform(scrollY) {
-  if (!phone) return;
-  const transformProgress = transformScroll > 0 ? Math.min(scrollY / transformScroll, 1) : 1;
-  const scale = START_SCALE + (END_SCALE - START_SCALE) * transformProgress;
-  const translatePercent = START_TRANSLATE_PERCENT + (END_TRANSLATE_PERCENT - START_TRANSLATE_PERCENT) * transformProgress;
-  const translateOffset = START_TRANSLATE_OFFSET + (END_TRANSLATE_OFFSET - START_TRANSLATE_OFFSET) * transformProgress;
-
-  phone.style.transform = `translateX(-50%) translateY(calc(${translatePercent}% + ${translateOffset}px)) scale(${scale})`;
-}
-
-function updateScreens(progress) {
-  const count = screenImages.length;
-  if (!count) return;
-
-  if (count === 1) {
-    screenImages[0].style.opacity = '1';
-    return;
-  }
-
-  if (progress >= 1) {
     screenImages.forEach((img, index) => {
-      img.style.opacity = index === count - 1 ? '1' : '0';
+      img.style.opacity = index === 0 ? '1' : '0';
     });
-    return;
-  }
 
-  const { index: currentIndexRaw, next: nextIndexRaw, local } = getSegmentState(progress, count);
-  const currentIndex = Math.min(currentIndexRaw, count - 1);
-  const nextIndex = Math.min(nextIndexRaw, count - 1);
-  const transitionStart = Math.min(VIEW_HOLD_PORTION, 1);
-  const transitionEnd = Math.min(transitionStart + VIEW_TRANSITION_PORTION, 0.999999);
-  const transitionRange = Math.max(transitionEnd - transitionStart, 0.0001);
-
-  let currentOpacity = 1;
-  let nextOpacity = 0;
-
-  if (currentIndex === nextIndex) {
-    currentOpacity = 1;
-    nextOpacity = 0;
-  } else if (local < transitionStart) {
-    currentOpacity = 1;
-    nextOpacity = 0;
-  } else if (local < transitionEnd) {
-    const t = (local - transitionStart) / transitionRange;
-    const eased = easeInOut(t);
-    currentOpacity = 1 - eased;
-    nextOpacity = eased;
-  } else {
-    currentOpacity = 0;
-    nextOpacity = 1;
-  }
-
-  screenImages.forEach((img, index) => {
-    let opacity = 0;
-    if (index === currentIndex) {
-      opacity = currentOpacity;
-    } else if (index === nextIndex) {
-      opacity = nextOpacity;
-    }
-    img.style.opacity = opacity.toFixed(3);
-  });
-}
-
-function updateCaptions(progress) {
-  if (!captionItems.length) return;
-
-  const count = captionItems.length;
-
-  if (count === 1) {
-    captionItems[0].el.style.opacity = '1';
-    captionItems[0].el.style.transform = 'translate3d(0, 0%, 0)';
-    return;
-  }
-
-  if (progress >= 1) {
-    captionItems.forEach(({ el }, index) => {
-      el.style.opacity = index === count - 1 ? '1' : '0';
-      const translate = index === count - 1 ? 0 : -CAPTION_OFFSET_PERCENT;
-      el.style.transform = `translate3d(0, ${translate}%, 0)`;
+    captionItems.forEach(({ el }) => {
+      el.style.opacity = '0';
+      el.style.transform = `translate3d(0, ${CAPTION_OFFSET_PERCENT}%, 0)`;
     });
-    return;
-  }
 
-  const totalScreens = screenImages.length;
-  const { index: currentIndexRaw, next: nextIndexRaw, local } = getSegmentState(progress, totalScreens);
-  const currentIndex = Math.min(currentIndexRaw, totalScreens - 1);
-  const nextIndex = Math.min(nextIndexRaw, totalScreens - 1);
-  const transitionStart = Math.min(VIEW_HOLD_PORTION, 1);
-  const transitionEnd = Math.min(transitionStart + VIEW_TRANSITION_PORTION, 0.999999);
-  const transitionRange = Math.max(transitionEnd - transitionStart, 0.0001);
-  const revealStart = Math.min(transitionEnd + CAPTION_SHOW_DELAY, 0.995);
-  const revealRange = Math.max(1 - revealStart, 0.0001);
-  const hasCaptionForCurrent = captionIndexSet.has(currentIndex);
-  const hasCaptionForNext = captionIndexSet.has(nextIndex);
+    function recalcLayout() {
+      const viewportHeight = window.innerHeight || 800;
+      const segments = Math.max(screenImages.length - 1, 1);
+      segmentScroll = Math.max(viewportHeight * 1.25, 800);
+      totalScroll = segmentScroll * segments;
+      transformScroll = Math.min(segmentScroll, totalScroll);
+      maxStep = Math.max(screenImages.length - 1, 0);
 
-  captionItems.forEach(({ el, screenIndex }) => {
-    let opacity = 0;
-    let translate = CAPTION_OFFSET_PERCENT;
+      if (scrollSpace) {
+        scrollSpace.style.height = `${Math.ceil(totalScroll + viewportHeight)}px`;
+      }
 
-    if (screenIndex < currentIndex) {
-      translate = -CAPTION_OFFSET_PERCENT;
+      snapTarget = Math.max(0, Math.min(latestScrollY, totalScroll));
+      const approxStep = getStepForScroll(snapTarget);
     }
 
-    if (screenIndex === currentIndex && hasCaptionForCurrent) {
+    function getSegmentState(progress, itemCount) {
+      const totalSegments = Math.max(itemCount - 1, 0);
+
+      if (totalSegments <= 0) {
+        return { index: 0, next: 0, local: 0, totalSegments };
+      }
+
+      if (progress >= 1) {
+        const last = totalSegments;
+        return { index: last, next: last, local: 1, totalSegments };
+      }
+
+      const clamped = Math.max(Math.min(progress, 0.999999), 0);
+      const raw = clamped * totalSegments;
+      const index = Math.floor(raw);
+      const local = raw - index;
+      return {
+        index,
+        next: Math.min(index + 1, totalSegments),
+        local,
+        totalSegments
+      };
+    }
+
+    function easeInOut(t) {
+      const clamped = Math.max(0, Math.min(1, t));
+      return clamped * clamped * (3 - 2 * clamped);
+    }
+
+    function applyPhoneTransform(scrollY) {
+      if (!phone) return;
+      const transformProgress = transformScroll > 0 ? Math.min(scrollY / transformScroll, 1) : 1;
+      const scale = START_SCALE + (END_SCALE - START_SCALE) * transformProgress;
+      const translatePercent = START_TRANSLATE_PERCENT + (END_TRANSLATE_PERCENT - START_TRANSLATE_PERCENT) * transformProgress;
+      const translateOffset = START_TRANSLATE_OFFSET + (END_TRANSLATE_OFFSET - START_TRANSLATE_OFFSET) * transformProgress;
+
+      phone.style.transform = `translateX(-50%) translateY(calc(${translatePercent}% + ${translateOffset}px)) scale(${scale})`;
+    }
+
+    function updateScreens(progress) {
+      const count = screenImages.length;
+      if (!count) return;
+
+      if (count === 1) {
+        screenImages[0].style.opacity = '1';
+        return;
+      }
+
+      if (progress >= 1) {
+        screenImages.forEach((img, index) => {
+          img.style.opacity = index === count - 1 ? '1' : '0';
+        });
+        return;
+      }
+
+      const { index: currentIndexRaw, next: nextIndexRaw, local } = getSegmentState(progress, count);
+      const currentIndex = Math.min(currentIndexRaw, count - 1);
+      const nextIndex = Math.min(nextIndexRaw, count - 1);
+      const transitionStart = Math.min(VIEW_HOLD_PORTION, 1);
+      const transitionEnd = Math.min(transitionStart + VIEW_TRANSITION_PORTION, 0.999999);
+      const transitionRange = Math.max(transitionEnd - transitionStart, 0.0001);
+
+      let currentOpacity = 1;
+      let nextOpacity = 0;
+
       if (currentIndex === nextIndex) {
-        opacity = 1;
-        translate = 0;
+        currentOpacity = 1;
+        nextOpacity = 0;
       } else if (local < transitionStart) {
-        opacity = 1;
-        translate = 0;
+        currentOpacity = 1;
+        nextOpacity = 0;
       } else if (local < transitionEnd) {
         const t = (local - transitionStart) / transitionRange;
         const eased = easeInOut(t);
-        opacity = Math.max(1 - eased, 0);
-        translate = -eased * CAPTION_OFFSET_PERCENT;
+        currentOpacity = 1 - eased;
+        nextOpacity = eased;
       } else {
-        opacity = 0;
-        translate = -CAPTION_OFFSET_PERCENT;
+        currentOpacity = 0;
+        nextOpacity = 1;
       }
-    } else if (screenIndex === nextIndex && hasCaptionForNext && nextIndex !== currentIndex) {
-      if (local < transitionEnd || local < revealStart) {
-        opacity = 0;
-        translate = CAPTION_OFFSET_PERCENT;
-      } else {
-        const tRaw = (local - revealStart) / revealRange;
-        const eased = easeInOut(tRaw);
-        opacity = eased;
-        translate = (1 - eased) * CAPTION_OFFSET_PERCENT;
-      }
-    } else if (screenIndex > nextIndex) {
-      opacity = 0;
-      translate = CAPTION_OFFSET_PERCENT;
-    } else {
-      opacity = 0;
-      translate = -CAPTION_OFFSET_PERCENT;
+
+      screenImages.forEach((img, index) => {
+        let opacity = 0;
+        if (index === currentIndex) {
+          opacity = currentOpacity;
+        } else if (index === nextIndex) {
+          opacity = nextOpacity;
+        }
+        img.style.opacity = opacity.toFixed(3);
+      });
     }
 
-    el.style.opacity = opacity.toFixed(3);
-    el.style.transform = `translate3d(0, ${translate}%, 0)`;
-  });
-}
+    function updateCaptions(progress) {
+      if (!captionItems.length) return;
 
-function updateHeroText(progress) {
-  if (!heroText) return;
-  const shouldHide = progress > 0.08;
-  if (shouldHide !== heroTextHidden) {
-    heroTextHidden = shouldHide;
-    heroText.classList.toggle('is-hidden', shouldHide);
-  }
-}
+      const count = captionItems.length;
 
-function applyTransforms(scrollY) {
-  const clampedScroll = Math.min(Math.max(scrollY, 0), totalScroll);
-  const progress = totalScroll > 0 ? clampedScroll / totalScroll : 1;
+      if (count === 1) {
+        captionItems[0].el.style.opacity = '1';
+        captionItems[0].el.style.transform = 'translate3d(0, 0%, 0)';
+        return;
+      }
 
-  applyPhoneTransform(clampedScroll);
-  updateScreens(progress);
-  updateCaptions(progress);
-  updateHeroText(progress);
-  if (snapInProgress && Math.abs(clampedScroll - snapTarget) < 1) {
-    snapInProgress = false;
-    latestScrollY = clampedScroll;
-    wheelDeltaBuffer = 0;
-  }
-}
+      if (progress >= 1) {
+        captionItems.forEach(({ el }, index) => {
+          el.style.opacity = index === count - 1 ? '1' : '0';
+          const translate = index === count - 1 ? 0 : -CAPTION_OFFSET_PERCENT;
+          el.style.transform = `translate3d(0, ${translate}%, 0)`;
+        });
+        return;
+      }
 
-function onUpdate() {
-  applyTransforms(latestScrollY);
-  ticking = false;
-  if (!snapInProgress) {
-    if (snapTimeoutId !== null) {
-      clearTimeout(snapTimeoutId);
+      const totalScreens = screenImages.length;
+      const { index: currentIndexRaw, next: nextIndexRaw, local } = getSegmentState(progress, totalScreens);
+      const currentIndex = Math.min(currentIndexRaw, totalScreens - 1);
+      const nextIndex = Math.min(nextIndexRaw, totalScreens - 1);
+      const transitionStart = Math.min(VIEW_HOLD_PORTION, 1);
+      const transitionEnd = Math.min(transitionStart + VIEW_TRANSITION_PORTION, 0.999999);
+      const transitionRange = Math.max(transitionEnd - transitionStart, 0.0001);
+      const revealStart = Math.min(transitionEnd + CAPTION_SHOW_DELAY, 0.995);
+      const revealRange = Math.max(1 - revealStart, 0.0001);
+      const hasCaptionForCurrent = captionIndexSet.has(currentIndex);
+      const hasCaptionForNext = captionIndexSet.has(nextIndex);
+
+      captionItems.forEach(({ el, screenIndex }) => {
+        let opacity = 0;
+        let translate = CAPTION_OFFSET_PERCENT;
+
+        if (screenIndex < currentIndex) {
+          translate = -CAPTION_OFFSET_PERCENT;
+        }
+
+        if (screenIndex === currentIndex && hasCaptionForCurrent) {
+          if (currentIndex === nextIndex) {
+            opacity = 1;
+            translate = 0;
+          } else if (local < transitionStart) {
+            opacity = 1;
+            translate = 0;
+          } else if (local < transitionEnd) {
+            const t = (local - transitionStart) / transitionRange;
+            const eased = easeInOut(t);
+            opacity = Math.max(1 - eased, 0);
+            translate = -eased * CAPTION_OFFSET_PERCENT;
+          } else {
+            opacity = 0;
+            translate = -CAPTION_OFFSET_PERCENT;
+          }
+        } else if (screenIndex === nextIndex && hasCaptionForNext && nextIndex !== currentIndex) {
+          if (local < transitionEnd || local < revealStart) {
+            opacity = 0;
+            translate = CAPTION_OFFSET_PERCENT;
+          } else {
+            const tRaw = (local - revealStart) / revealRange;
+            const eased = easeInOut(tRaw);
+            opacity = eased;
+            translate = (1 - eased) * CAPTION_OFFSET_PERCENT;
+          }
+        } else if (screenIndex > nextIndex) {
+          opacity = 0;
+          translate = CAPTION_OFFSET_PERCENT;
+        } else {
+          opacity = 0;
+          translate = -CAPTION_OFFSET_PERCENT;
+        }
+
+        el.style.opacity = opacity.toFixed(3);
+        el.style.transform = `translate3d(0, ${translate}%, 0)`;
+      });
     }
-    snapTimeoutId = window.setTimeout(() => {
-      snapTimeoutId = null;
-      snapToNearestStep(false);
-    }, 160);
-  }
-}
 
-function onScroll() {
-  latestScrollY = window.scrollY;
-  if (!ticking) {
-    ticking = true;
-    requestAnimationFrame(onUpdate);
-  }
-}
+    function updateHeroText(progress) {
+      if (!heroText) return;
+      const shouldHide = progress > 0.08;
+      if (shouldHide !== heroTextHidden) {
+        heroTextHidden = shouldHide;
+        heroText.classList.toggle('is-hidden', shouldHide);
+      }
+    }
 
-recalcLayout();
-applyTransforms(window.scrollY);
+    function applyTransforms(scrollY) {
+      const clampedScroll = Math.min(Math.max(scrollY, 0), totalScroll);
+      const progress = totalScroll > 0 ? clampedScroll / totalScroll : 1;
 
-window.addEventListener('scroll', onScroll, { passive: true });
-window.addEventListener('resize', () => {
-  recalcLayout();
-  applyTransforms(window.scrollY);
-  snapToNearestStep(true);
-});
+      applyPhoneTransform(clampedScroll);
+      updateScreens(progress);
+      updateCaptions(progress);
+      updateHeroText(progress);
+      if (snapInProgress && Math.abs(clampedScroll - snapTarget) < 1) {
+        snapInProgress = false;
+        latestScrollY = clampedScroll;
+        wheelDeltaBuffer = 0;
+      }
+    }
 
-function getCurrentStep() {
-  return getStepForScroll(latestScrollY);
-}
+    function onUpdate() {
+      applyTransforms(latestScrollY);
+      ticking = false;
+      if (!snapInProgress) {
+        if (snapTimeoutId !== null) {
+          clearTimeout(snapTimeoutId);
+        }
+        snapTimeoutId = window.setTimeout(() => {
+          snapTimeoutId = null;
+          snapToNearestStep(false);
+        }, 160);
+      }
+    }
 
-function getStepForScroll(scrollValue) {
-  if (segmentScroll <= 0) return 0;
-  const raw = scrollValue / segmentScroll;
-  const step = Math.floor(raw + STEP_HYSTERESIS);
-  return Math.max(0, Math.min(step, maxStep));
-}
-
-function goToStep(step) {
-  if (maxStep <= 0) return;
-  const clampedStep = Math.max(0, Math.min(step, maxStep));
-  const target = clampedStep * segmentScroll;
-  if (Math.abs(target - latestScrollY) < 1) {
-    snapInProgress = false;
-    wheelDeltaBuffer = 0;
-    return;
-  }
-  if (snapTimeoutId !== null) {
-    clearTimeout(snapTimeoutId);
-    snapTimeoutId = null;
-  }
-  if (scrollAnimationFrame !== null) {
-    cancelAnimationFrame(scrollAnimationFrame);
-    scrollAnimationFrame = null;
-  }
-  snapTarget = target;
-  snapInProgress = true;
-  wheelDeltaBuffer = 0;
-  animateScrollTo(target);
-}
-
-function snapToNearestStep(force = false) {
-  if (snapInProgress || segmentScroll <= 0) return;
-  const clampedStep = getStepForScroll(latestScrollY);
-  const target = clampedStep * segmentScroll;
-  if (!force && Math.abs(target - latestScrollY) <= 2) {
-    return;
-  }
-  wheelDeltaBuffer = 0;
-  goToStep(clampedStep);
-}
-
-function animateScrollTo(target) {
-  const startY = window.scrollY;
-  const distance = target - startY;
-  const duration = SCROLL_ANIMATION_DURATION;
-  const startTime = performance.now();
-
-  function step(now) {
-    const elapsed = Math.min(now - startTime, duration);
-    const t = easeInOut(elapsed / duration);
-    window.scrollTo(0, startY + distance * t);
-    if (elapsed < duration) {
-      scrollAnimationFrame = requestAnimationFrame(step);
-    } else {
-      scrollAnimationFrame = null;
-      snapInProgress = false;
+    function onScroll() {
       latestScrollY = window.scrollY;
-      wheelDeltaBuffer = 0;
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(onUpdate);
+      }
     }
-  }
 
-  scrollAnimationFrame = requestAnimationFrame(step);
-}
+    recalcLayout();
+    applyTransforms(window.scrollY);
 
-function onWheelSnap(event) {
-  if (maxStep <= 0 || segmentScroll <= 0) return;
-  const delta = event.deltaY;
-  if (Math.abs(delta) < 1) return;
-  event.preventDefault();
-  if (snapInProgress) return;
-  wheelDeltaBuffer += delta;
-  const absBuffer = Math.abs(wheelDeltaBuffer);
-  if (absBuffer < WHEEL_TRIGGER_DELTA) {
-    return;
-  }
-  const direction = wheelDeltaBuffer > 0 ? 1 : -1;
-  wheelDeltaBuffer = 0;
-  const currentStep = getCurrentStep();
-  goToStep(currentStep + direction);
-}
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', () => {
+      recalcLayout();
+      applyTransforms(window.scrollY);
+      snapToNearestStep(true);
+    });
 
-function onKeydownSnap(event) {
-  if (maxStep <= 0 || segmentScroll <= 0) return;
-  const active = document.activeElement;
-  if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) {
-    return;
-  }
-  let handled = false;
-  const currentStep = getCurrentStep();
+    function getCurrentStep() {
+      return getStepForScroll(latestScrollY);
+    }
 
-  switch (event.key) {
-    case 'ArrowDown':
-    case 'PageDown':
-      goToStep(currentStep + 1);
-      handled = true;
-      break;
-    case ' ':
-      goToStep(currentStep + (event.shiftKey ? -1 : 1));
-      handled = true;
-      break;
-    case 'ArrowUp':
-    case 'PageUp':
-      goToStep(currentStep - 1);
-      handled = true;
-      break;
-    case 'Home':
-      goToStep(0);
-      handled = true;
-      break;
-    case 'End':
-      goToStep(maxStep);
-      handled = true;
-      break;
-    default:
-      break;
-  }
+    function getStepForScroll(scrollValue) {
+      if (segmentScroll <= 0) return 0;
+      const raw = scrollValue / segmentScroll;
+      const step = Math.floor(raw + STEP_HYSTERESIS);
+      return Math.max(0, Math.min(step, maxStep));
+    }
 
-  if (handled) {
-    event.preventDefault();
-  }
-}
+    function goToStep(step) {
+      if (maxStep <= 0) return;
+      const clampedStep = Math.max(0, Math.min(step, maxStep));
+      const target = clampedStep * segmentScroll;
+      if (Math.abs(target - latestScrollY) < 1) {
+        snapInProgress = false;
+        wheelDeltaBuffer = 0;
+        return;
+      }
+      if (snapTimeoutId !== null) {
+        clearTimeout(snapTimeoutId);
+        snapTimeoutId = null;
+      }
+      if (scrollAnimationFrame !== null) {
+        cancelAnimationFrame(scrollAnimationFrame);
+        scrollAnimationFrame = null;
+      }
+      snapTarget = target;
+      snapInProgress = true;
+      wheelDeltaBuffer = 0;
+      animateScrollTo(target);
+    }
 
-window.addEventListener('wheel', onWheelSnap, { passive: false });
-window.addEventListener('keydown', onKeydownSnap);
+    function snapToNearestStep(force = false) {
+      if (snapInProgress || segmentScroll <= 0) return;
+      const clampedStep = getStepForScroll(latestScrollY);
+      const target = clampedStep * segmentScroll;
+      if (!force && Math.abs(target - latestScrollY) <= 2) {
+        return;
+      }
+      wheelDeltaBuffer = 0;
+      goToStep(clampedStep);
+    }
 
-if (footerYear) {
-  footerYear.textContent = new Date().getFullYear();
-}
-</script>
+    function animateScrollTo(target) {
+      const startY = window.scrollY;
+      const distance = target - startY;
+      const duration = SCROLL_ANIMATION_DURATION;
+      const startTime = performance.now();
+
+      function step(now) {
+        const elapsed = Math.min(now - startTime, duration);
+        const t = easeInOut(elapsed / duration);
+        window.scrollTo(0, startY + distance * t);
+        if (elapsed < duration) {
+          scrollAnimationFrame = requestAnimationFrame(step);
+        } else {
+          scrollAnimationFrame = null;
+          snapInProgress = false;
+          latestScrollY = window.scrollY;
+          wheelDeltaBuffer = 0;
+        }
+      }
+
+      scrollAnimationFrame = requestAnimationFrame(step);
+    }
+
+    function onWheelSnap(event) {
+      if (maxStep <= 0 || segmentScroll <= 0) return;
+      const delta = event.deltaY;
+      if (Math.abs(delta) < 1) return;
+      event.preventDefault();
+      if (snapInProgress) return;
+      wheelDeltaBuffer += delta;
+      const absBuffer = Math.abs(wheelDeltaBuffer);
+      if (absBuffer < WHEEL_TRIGGER_DELTA) {
+        return;
+      }
+      const direction = wheelDeltaBuffer > 0 ? 1 : -1;
+      wheelDeltaBuffer = 0;
+      const currentStep = getCurrentStep();
+      goToStep(currentStep + direction);
+    }
+
+    function onKeydownSnap(event) {
+      if (maxStep <= 0 || segmentScroll <= 0) return;
+      const active = document.activeElement;
+      if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) {
+        return;
+      }
+      let handled = false;
+      const currentStep = getCurrentStep();
+
+      switch (event.key) {
+        case 'ArrowDown':
+        case 'PageDown':
+          goToStep(currentStep + 1);
+          handled = true;
+          break;
+        case ' ':
+          goToStep(currentStep + (event.shiftKey ? -1 : 1));
+          handled = true;
+          break;
+        case 'ArrowUp':
+        case 'PageUp':
+          goToStep(currentStep - 1);
+          handled = true;
+          break;
+        case 'Home':
+          goToStep(0);
+          handled = true;
+          break;
+        case 'End':
+          goToStep(maxStep);
+          handled = true;
+          break;
+        default:
+          break;
+      }
+
+      if (handled) {
+        event.preventDefault();
+      }
+    }
+
+    window.addEventListener('wheel', onWheelSnap, { passive: false });
+    window.addEventListener('keydown', onKeydownSnap);
+
+    if (footerYear) {
+      footerYear.textContent = new Date().getFullYear();
+    }
+  </script>
 </body>
+
 </html>
