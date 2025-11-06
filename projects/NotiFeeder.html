@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>App Showcase</title>
-  <link rel="stylesheet" href="stylesheet.css">
+  <link rel="stylesheet" href="test.css">
 </head>
 <body>
   <div class="hero">
@@ -61,6 +61,7 @@ const captionItems = Array.from(document.querySelectorAll('.view-caption'))
   }))
   .filter((item) => Number.isInteger(item.screenIndex) && item.screenIndex >= 0)
   .sort((a, b) => a.screenIndex - b.screenIndex);
+const captionIndexSet = new Set(captionItems.map((item) => item.screenIndex));
 const footerYear = document.getElementById('footerYear');
 
 const START_TRANSLATE_PERCENT = -10;
@@ -71,9 +72,12 @@ const START_SCALE = 1;
 const END_SCALE = 0.6;
 
 const CAPTION_OFFSET_PERCENT = 42;
-const VIEW_HOLD_PORTION = 0.55;
-const VIEW_TRANSITION_PORTION = 0.2;
-const CAPTION_SHOW_DELAY = 0.08;
+const VIEW_HOLD_PORTION = 0.5;
+const VIEW_TRANSITION_PORTION = 0.35;
+const CAPTION_SHOW_DELAY = 0.12;
+const WHEEL_TRIGGER_DELTA = 100;
+const SCROLL_ANIMATION_DURATION = 420;
+const STEP_HYSTERESIS = 0.35;
 
 let segmentScroll = 400;
 let totalScroll = 1;
@@ -81,6 +85,13 @@ let transformScroll = 1;
 let latestScrollY = window.scrollY;
 let ticking = false;
 let heroTextHidden = false;
+let maxStep = 0;
+let snapInProgress = false;
+let snapTarget = window.scrollY;
+let snapTimeoutId = null;
+let wheelDeltaBuffer = 0;
+let currentStepIndex = 0;
+let scrollAnimationFrame = null;
 
 if (phone) {
   phone.style.willChange = 'transform';
@@ -98,13 +109,17 @@ captionItems.forEach(({ el }) => {
 function recalcLayout() {
   const viewportHeight = window.innerHeight || 800;
   const segments = Math.max(screenImages.length - 1, 1);
-  segmentScroll = Math.max(viewportHeight * 1.1, 700);
+  segmentScroll = Math.max(viewportHeight * 1.25, 800);
   totalScroll = segmentScroll * segments;
   transformScroll = Math.min(segmentScroll, totalScroll);
+  maxStep = Math.max(screenImages.length - 1, 0);
 
   if (scrollSpace) {
     scrollSpace.style.height = `${Math.ceil(totalScroll + viewportHeight)}px`;
   }
+
+  snapTarget = Math.max(0, Math.min(latestScrollY, totalScroll));
+  const approxStep = getStepForScroll(snapTarget);
 }
 
 function getSegmentState(progress, itemCount) {
@@ -129,6 +144,11 @@ function getSegmentState(progress, itemCount) {
     local,
     totalSegments
   };
+}
+
+function easeInOut(t) {
+  const clamped = Math.max(0, Math.min(1, t));
+  return clamped * clamped * (3 - 2 * clamped);
 }
 
 function applyPhoneTransform(scrollY) {
@@ -175,8 +195,9 @@ function updateScreens(progress) {
     nextOpacity = 0;
   } else if (local < transitionEnd) {
     const t = (local - transitionStart) / transitionRange;
-    currentOpacity = 1 - t;
-    nextOpacity = t;
+    const eased = easeInOut(t);
+    currentOpacity = 1 - eased;
+    nextOpacity = eased;
   } else {
     currentOpacity = 0;
     nextOpacity = 1;
@@ -197,7 +218,6 @@ function updateCaptions(progress) {
   if (!captionItems.length) return;
 
   const count = captionItems.length;
-  const captionIndexSet = new Set(captionItems.map((item) => item.screenIndex));
 
   if (count === 1) {
     captionItems[0].el.style.opacity = '1';
@@ -243,8 +263,9 @@ function updateCaptions(progress) {
         translate = 0;
       } else if (local < transitionEnd) {
         const t = (local - transitionStart) / transitionRange;
-        opacity = Math.max(1 - t, 0);
-        translate = -t * CAPTION_OFFSET_PERCENT;
+        const eased = easeInOut(t);
+        opacity = Math.max(1 - eased, 0);
+        translate = -eased * CAPTION_OFFSET_PERCENT;
       } else {
         opacity = 0;
         translate = -CAPTION_OFFSET_PERCENT;
@@ -255,9 +276,9 @@ function updateCaptions(progress) {
         translate = CAPTION_OFFSET_PERCENT;
       } else {
         const tRaw = (local - revealStart) / revealRange;
-        const t = Math.min(Math.max(tRaw, 0), 1);
-        opacity = t;
-        translate = (1 - t) * CAPTION_OFFSET_PERCENT;
+        const eased = easeInOut(tRaw);
+        opacity = eased;
+        translate = (1 - eased) * CAPTION_OFFSET_PERCENT;
       }
     } else if (screenIndex > nextIndex) {
       opacity = 0;
@@ -289,11 +310,25 @@ function applyTransforms(scrollY) {
   updateScreens(progress);
   updateCaptions(progress);
   updateHeroText(progress);
+  if (snapInProgress && Math.abs(clampedScroll - snapTarget) < 1) {
+    snapInProgress = false;
+    latestScrollY = clampedScroll;
+    wheelDeltaBuffer = 0;
+  }
 }
 
 function onUpdate() {
   applyTransforms(latestScrollY);
   ticking = false;
+  if (!snapInProgress) {
+    if (snapTimeoutId !== null) {
+      clearTimeout(snapTimeoutId);
+    }
+    snapTimeoutId = window.setTimeout(() => {
+      snapTimeoutId = null;
+      snapToNearestStep(false);
+    }, 160);
+  }
 }
 
 function onScroll() {
@@ -311,7 +346,137 @@ window.addEventListener('scroll', onScroll, { passive: true });
 window.addEventListener('resize', () => {
   recalcLayout();
   applyTransforms(window.scrollY);
+  snapToNearestStep(true);
 });
+
+function getCurrentStep() {
+  return getStepForScroll(latestScrollY);
+}
+
+function getStepForScroll(scrollValue) {
+  if (segmentScroll <= 0) return 0;
+  const raw = scrollValue / segmentScroll;
+  const step = Math.floor(raw + STEP_HYSTERESIS);
+  return Math.max(0, Math.min(step, maxStep));
+}
+
+function goToStep(step) {
+  if (maxStep <= 0) return;
+  const clampedStep = Math.max(0, Math.min(step, maxStep));
+  const target = clampedStep * segmentScroll;
+  if (Math.abs(target - latestScrollY) < 1) {
+    snapInProgress = false;
+    wheelDeltaBuffer = 0;
+    return;
+  }
+  if (snapTimeoutId !== null) {
+    clearTimeout(snapTimeoutId);
+    snapTimeoutId = null;
+  }
+  if (scrollAnimationFrame !== null) {
+    cancelAnimationFrame(scrollAnimationFrame);
+    scrollAnimationFrame = null;
+  }
+  snapTarget = target;
+  snapInProgress = true;
+  wheelDeltaBuffer = 0;
+  animateScrollTo(target);
+}
+
+function snapToNearestStep(force = false) {
+  if (snapInProgress || segmentScroll <= 0) return;
+  const clampedStep = getStepForScroll(latestScrollY);
+  const target = clampedStep * segmentScroll;
+  if (!force && Math.abs(target - latestScrollY) <= 2) {
+    return;
+  }
+  wheelDeltaBuffer = 0;
+  goToStep(clampedStep);
+}
+
+function animateScrollTo(target) {
+  const startY = window.scrollY;
+  const distance = target - startY;
+  const duration = SCROLL_ANIMATION_DURATION;
+  const startTime = performance.now();
+
+  function step(now) {
+    const elapsed = Math.min(now - startTime, duration);
+    const t = easeInOut(elapsed / duration);
+    window.scrollTo(0, startY + distance * t);
+    if (elapsed < duration) {
+      scrollAnimationFrame = requestAnimationFrame(step);
+    } else {
+      scrollAnimationFrame = null;
+      snapInProgress = false;
+      latestScrollY = window.scrollY;
+      wheelDeltaBuffer = 0;
+    }
+  }
+
+  scrollAnimationFrame = requestAnimationFrame(step);
+}
+
+function onWheelSnap(event) {
+  if (maxStep <= 0 || segmentScroll <= 0) return;
+  const delta = event.deltaY;
+  if (Math.abs(delta) < 1) return;
+  event.preventDefault();
+  if (snapInProgress) return;
+  wheelDeltaBuffer += delta;
+  const absBuffer = Math.abs(wheelDeltaBuffer);
+  if (absBuffer < WHEEL_TRIGGER_DELTA) {
+    return;
+  }
+  const direction = wheelDeltaBuffer > 0 ? 1 : -1;
+  wheelDeltaBuffer = 0;
+  const currentStep = getCurrentStep();
+  goToStep(currentStep + direction);
+}
+
+function onKeydownSnap(event) {
+  if (maxStep <= 0 || segmentScroll <= 0) return;
+  const active = document.activeElement;
+  if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) {
+    return;
+  }
+  let handled = false;
+  const currentStep = getCurrentStep();
+
+  switch (event.key) {
+    case 'ArrowDown':
+    case 'PageDown':
+      goToStep(currentStep + 1);
+      handled = true;
+      break;
+    case ' ':
+      goToStep(currentStep + (event.shiftKey ? -1 : 1));
+      handled = true;
+      break;
+    case 'ArrowUp':
+    case 'PageUp':
+      goToStep(currentStep - 1);
+      handled = true;
+      break;
+    case 'Home':
+      goToStep(0);
+      handled = true;
+      break;
+    case 'End':
+      goToStep(maxStep);
+      handled = true;
+      break;
+    default:
+      break;
+  }
+
+  if (handled) {
+    event.preventDefault();
+  }
+}
+
+window.addEventListener('wheel', onWheelSnap, { passive: false });
+window.addEventListener('keydown', onKeydownSnap);
 
 if (footerYear) {
   footerYear.textContent = new Date().getFullYear();
