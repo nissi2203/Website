@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>App Showcase</title>
+  <link rel="stylesheet" href="test.css">
+</head>
+<body>
+  <div class="hero">
+    <div class="hero-text">
+      <h1 class="hero-title">NotiFeeder</h1>
+      <p class="hero-tagline">Quick access to every update, all in one clear and focused hub.</p>
+      <div class="hero-actions">
+        <a href="#" class="cta-button cta-button--primary">View on Mac App Store</a>
+        <a href="#" class="cta-button cta-button--ghost">Explore More Apps</a>
+      </div>
+    </div>
+    <div class="phone-container">
+      <img src="iPhone16-Teal-H.png" alt="iPhone 16 Rahmen" class="iphone-frame">
+      <div class="app-screen-stack" aria-hidden="true">
+        <img src="AppViews/HomeView.PNG" alt="" class="app-screen">
+        <img src="AppViews/View_Feed_Unread_New_to_Old.PNG" alt="" class="app-screen">
+        <img src="AppViews/View_Feed_Read_New_to_Old.PNG" alt="" class="app-screen">
+        <img src="AppViews/View_Search.PNG" alt="" class="app-screen">
+        <img src="AppViews/View_Settings.PNG" alt="" class="app-screen">
+      </div>
+    </div>
+    <div class="view-captions" aria-hidden="true">
+      <div class="view-caption view-caption--left" data-screen-index="1">
+        <span class="view-caption__eyebrow">Unread Feed</span>
+        <p class="view-caption__body">See every new notification in one stream, ordered latest first so nothing slips through.</p>
+      </div>
+      <div class="view-caption view-caption--right" data-screen-index="2">
+        <span class="view-caption__eyebrow">Read Feed</span>
+        <p class="view-caption__body">Revisit what you already checked and jump straight back into conversations that matter.</p>
+      </div>
+      <div class="view-caption view-caption--left" data-screen-index="3">
+        <span class="view-caption__eyebrow">Search</span>
+        <p class="view-caption__body">Filter by teams, topics, or keywords to pinpoint the update you need in seconds.</p>
+      </div>
+      <div class="view-caption view-caption--right" data-screen-index="4">
+        <span class="view-caption__eyebrow">Settings</span>
+        <p class="view-caption__body">Tune delivery channels, quiet hours, and device sync so notifications match your flow.</p>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-space" aria-hidden="true"></div>
+  <footer class="site-footer">
+    <p>&copy; <span id="footerYear"></span> Dyonisos Fergadiotis. All rights reserved.</p>
+  </footer>
+<script>
+const phone = document.querySelector('.phone-container');
+const heroText = document.querySelector('.hero-text');
+const scrollSpace = document.querySelector('.scroll-space');
+const screenImages = Array.from(document.querySelectorAll('.app-screen'));
+const captionItems = Array.from(document.querySelectorAll('.view-caption'))
+  .map((el) => ({
+    el,
+    screenIndex: Number.parseInt(el.dataset.screenIndex ?? '-1', 10),
+  }))
+  .filter((item) => Number.isInteger(item.screenIndex) && item.screenIndex >= 0)
+  .sort((a, b) => a.screenIndex - b.screenIndex);
+const footerYear = document.getElementById('footerYear');
+
+const START_TRANSLATE_PERCENT = -10;
+const START_TRANSLATE_OFFSET = 75;
+const END_TRANSLATE_PERCENT = -50;
+const END_TRANSLATE_OFFSET = 0;
+const START_SCALE = 1;
+const END_SCALE = 0.6;
+
+const CAPTION_OFFSET_PERCENT = 42;
+const VIEW_HOLD_PORTION = 0.55;
+const VIEW_TRANSITION_PORTION = 0.2;
+const CAPTION_SHOW_DELAY = 0.08;
+
+let segmentScroll = 400;
+let totalScroll = 1;
+let transformScroll = 1;
+let latestScrollY = window.scrollY;
+let ticking = false;
+let heroTextHidden = false;
+
+if (phone) {
+  phone.style.willChange = 'transform';
+}
+
+screenImages.forEach((img, index) => {
+  img.style.opacity = index === 0 ? '1' : '0';
+});
+
+captionItems.forEach(({ el }) => {
+  el.style.opacity = '0';
+  el.style.transform = `translate3d(0, ${CAPTION_OFFSET_PERCENT}%, 0)`;
+});
+
+function recalcLayout() {
+  const viewportHeight = window.innerHeight || 800;
+  const segments = Math.max(screenImages.length - 1, 1);
+  segmentScroll = Math.max(viewportHeight * 1.1, 700);
+  totalScroll = segmentScroll * segments;
+  transformScroll = Math.min(segmentScroll, totalScroll);
+
+  if (scrollSpace) {
+    scrollSpace.style.height = `${Math.ceil(totalScroll + viewportHeight)}px`;
+  }
+}
+
+function getSegmentState(progress, itemCount) {
+  const totalSegments = Math.max(itemCount - 1, 0);
+
+  if (totalSegments <= 0) {
+    return { index: 0, next: 0, local: 0, totalSegments };
+  }
+
+  if (progress >= 1) {
+    const last = totalSegments;
+    return { index: last, next: last, local: 1, totalSegments };
+  }
+
+  const clamped = Math.max(Math.min(progress, 0.999999), 0);
+  const raw = clamped * totalSegments;
+  const index = Math.floor(raw);
+  const local = raw - index;
+  return {
+    index,
+    next: Math.min(index + 1, totalSegments),
+    local,
+    totalSegments
+  };
+}
+
+function applyPhoneTransform(scrollY) {
+  if (!phone) return;
+  const transformProgress = transformScroll > 0 ? Math.min(scrollY / transformScroll, 1) : 1;
+  const scale = START_SCALE + (END_SCALE - START_SCALE) * transformProgress;
+  const translatePercent = START_TRANSLATE_PERCENT + (END_TRANSLATE_PERCENT - START_TRANSLATE_PERCENT) * transformProgress;
+  const translateOffset = START_TRANSLATE_OFFSET + (END_TRANSLATE_OFFSET - START_TRANSLATE_OFFSET) * transformProgress;
+
+  phone.style.transform = `translateX(-50%) translateY(calc(${translatePercent}% + ${translateOffset}px)) scale(${scale})`;
+}
+
+function updateScreens(progress) {
+  const count = screenImages.length;
+  if (!count) return;
+
+  if (count === 1) {
+    screenImages[0].style.opacity = '1';
+    return;
+  }
+
+  if (progress >= 1) {
+    screenImages.forEach((img, index) => {
+      img.style.opacity = index === count - 1 ? '1' : '0';
+    });
+    return;
+  }
+
+  const { index: currentIndexRaw, next: nextIndexRaw, local } = getSegmentState(progress, count);
+  const currentIndex = Math.min(currentIndexRaw, count - 1);
+  const nextIndex = Math.min(nextIndexRaw, count - 1);
+  const transitionStart = Math.min(VIEW_HOLD_PORTION, 1);
+  const transitionEnd = Math.min(transitionStart + VIEW_TRANSITION_PORTION, 0.999999);
+  const transitionRange = Math.max(transitionEnd - transitionStart, 0.0001);
+
+  let currentOpacity = 1;
+  let nextOpacity = 0;
+
+  if (currentIndex === nextIndex) {
+    currentOpacity = 1;
+    nextOpacity = 0;
+  } else if (local < transitionStart) {
+    currentOpacity = 1;
+    nextOpacity = 0;
+  } else if (local < transitionEnd) {
+    const t = (local - transitionStart) / transitionRange;
+    currentOpacity = 1 - t;
+    nextOpacity = t;
+  } else {
+    currentOpacity = 0;
+    nextOpacity = 1;
+  }
+
+  screenImages.forEach((img, index) => {
+    let opacity = 0;
+    if (index === currentIndex) {
+      opacity = currentOpacity;
+    } else if (index === nextIndex) {
+      opacity = nextOpacity;
+    }
+    img.style.opacity = opacity.toFixed(3);
+  });
+}
+
+function updateCaptions(progress) {
+  if (!captionItems.length) return;
+
+  const count = captionItems.length;
+  const captionIndexSet = new Set(captionItems.map((item) => item.screenIndex));
+
+  if (count === 1) {
+    captionItems[0].el.style.opacity = '1';
+    captionItems[0].el.style.transform = 'translate3d(0, 0%, 0)';
+    return;
+  }
+
+  if (progress >= 1) {
+    captionItems.forEach(({ el }, index) => {
+      el.style.opacity = index === count - 1 ? '1' : '0';
+      const translate = index === count - 1 ? 0 : -CAPTION_OFFSET_PERCENT;
+      el.style.transform = `translate3d(0, ${translate}%, 0)`;
+    });
+    return;
+  }
+
+  const totalScreens = screenImages.length;
+  const { index: currentIndexRaw, next: nextIndexRaw, local } = getSegmentState(progress, totalScreens);
+  const currentIndex = Math.min(currentIndexRaw, totalScreens - 1);
+  const nextIndex = Math.min(nextIndexRaw, totalScreens - 1);
+  const transitionStart = Math.min(VIEW_HOLD_PORTION, 1);
+  const transitionEnd = Math.min(transitionStart + VIEW_TRANSITION_PORTION, 0.999999);
+  const transitionRange = Math.max(transitionEnd - transitionStart, 0.0001);
+  const revealStart = Math.min(transitionEnd + CAPTION_SHOW_DELAY, 0.995);
+  const revealRange = Math.max(1 - revealStart, 0.0001);
+  const hasCaptionForCurrent = captionIndexSet.has(currentIndex);
+  const hasCaptionForNext = captionIndexSet.has(nextIndex);
+
+  captionItems.forEach(({ el, screenIndex }) => {
+    let opacity = 0;
+    let translate = CAPTION_OFFSET_PERCENT;
+
+    if (screenIndex < currentIndex) {
+      translate = -CAPTION_OFFSET_PERCENT;
+    }
+
+    if (screenIndex === currentIndex && hasCaptionForCurrent) {
+      if (currentIndex === nextIndex) {
+        opacity = 1;
+        translate = 0;
+      } else if (local < transitionStart) {
+        opacity = 1;
+        translate = 0;
+      } else if (local < transitionEnd) {
+        const t = (local - transitionStart) / transitionRange;
+        opacity = Math.max(1 - t, 0);
+        translate = -t * CAPTION_OFFSET_PERCENT;
+      } else {
+        opacity = 0;
+        translate = -CAPTION_OFFSET_PERCENT;
+      }
+    } else if (screenIndex === nextIndex && hasCaptionForNext && nextIndex !== currentIndex) {
+      if (local < transitionEnd || local < revealStart) {
+        opacity = 0;
+        translate = CAPTION_OFFSET_PERCENT;
+      } else {
+        const tRaw = (local - revealStart) / revealRange;
+        const t = Math.min(Math.max(tRaw, 0), 1);
+        opacity = t;
+        translate = (1 - t) * CAPTION_OFFSET_PERCENT;
+      }
+    } else if (screenIndex > nextIndex) {
+      opacity = 0;
+      translate = CAPTION_OFFSET_PERCENT;
+    } else {
+      opacity = 0;
+      translate = -CAPTION_OFFSET_PERCENT;
+    }
+
+    el.style.opacity = opacity.toFixed(3);
+    el.style.transform = `translate3d(0, ${translate}%, 0)`;
+  });
+}
+
+function updateHeroText(progress) {
+  if (!heroText) return;
+  const shouldHide = progress > 0.08;
+  if (shouldHide !== heroTextHidden) {
+    heroTextHidden = shouldHide;
+    heroText.classList.toggle('is-hidden', shouldHide);
+  }
+}
+
+function applyTransforms(scrollY) {
+  const clampedScroll = Math.min(Math.max(scrollY, 0), totalScroll);
+  const progress = totalScroll > 0 ? clampedScroll / totalScroll : 1;
+
+  applyPhoneTransform(clampedScroll);
+  updateScreens(progress);
+  updateCaptions(progress);
+  updateHeroText(progress);
+}
+
+function onUpdate() {
+  applyTransforms(latestScrollY);
+  ticking = false;
+}
+
+function onScroll() {
+  latestScrollY = window.scrollY;
+  if (!ticking) {
+    ticking = true;
+    requestAnimationFrame(onUpdate);
+  }
+}
+
+recalcLayout();
+applyTransforms(window.scrollY);
+
+window.addEventListener('scroll', onScroll, { passive: true });
+window.addEventListener('resize', () => {
+  recalcLayout();
+  applyTransforms(window.scrollY);
+});
+
+if (footerYear) {
+  footerYear.textContent = new Date().getFullYear();
+}
+</script>
+</body>
+</html>
