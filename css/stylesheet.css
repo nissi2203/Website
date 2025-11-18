@@ -8,6 +8,9 @@
     --muted-color: #9aa0a6;
     --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.03);
     --shadow-hover: 0 10px 24px rgba(0, 0, 0, 0.08);
+    --hero-inner-radius: 22px;
+    --hero-inner-gap-vertical: 18%;
+    --hero-inner-gap-horizontal: 14%;
 }
 
 /* --- Base Styles --- */
@@ -235,16 +238,17 @@ section {
     background: linear-gradient(135deg, rgba(0, 191, 166, 0.16), rgba(255, 213, 107, 0.16));
     border: 1px solid rgba(0, 191, 166, 0.28);
     overflow: hidden;
-    display: grid;
-    place-items: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     box-shadow: var(--shadow-light);
 }
 
 .hero-avatar::before {
     content: '';
     position: absolute;
-    inset: 12%;
-    border-radius: 22px;
+    inset: var(--hero-inner-gap-vertical) var(--hero-inner-gap-horizontal);
+    border-radius: var(--hero-inner-radius);
     background: linear-gradient(135deg, rgba(0, 191, 166, 0.65), rgba(255, 213, 107, 0.55));
     filter: blur(24px);
     opacity: 0.35;
@@ -252,13 +256,40 @@ section {
 
 .hero-avatar .glow {
     position: relative;
+    display: block;
     width: 68%;
     aspect-ratio: 1 / 1;
-    border-radius: 22px;
+    border-radius: var(--hero-inner-radius);
     background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.9), rgba(0, 191, 166, 0.4));
     box-shadow:
         inset 0 0 40px rgba(255, 255, 255, 0.8),
         0 20px 34px rgba(0, 191, 166, 0.32);
+    z-index: 1;
+    margin: 0 auto;
+}
+
+.hero-avatar .hero-app-rectangles {
+    position: absolute;
+    inset: var(--hero-inner-gap-vertical) var(--hero-inner-gap-horizontal);
+    border-radius: var(--hero-inner-radius);
+    background: rgba(255, 255, 255, 0.18);
+    overflow: hidden;
+    box-shadow: inset 0 10px 30px rgba(255, 255, 255, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 0;
+    z-index: 2;
+}
+
+.hero-app-rectangles span {
+    width: 42%;
+    height: 68%;
+    border-radius: var(--hero-inner-radius);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.2));
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: inset 0 8px 16px rgba(255, 255, 255, 0.8), 0 8px 24px rgba(0, 0, 0, 0.2);
 }
 
 .hero-avatar-label {
@@ -307,6 +338,7 @@ section {
 }
 
 .card {
+    position: relative;
     background: rgba(255, 255, 255, 0.9);
     border: 1px solid var(--border-color);
     border-radius: 14px;
@@ -316,6 +348,18 @@ section {
     display: flex;
     flex-direction: column;
     gap: 16px;
+}
+
+.card-icon {
+    position: absolute;
+    top: 28px;
+    right: 28px;
+    width: 68px;
+    height: 68px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.12);
+    object-fit: contain;
 }
 
 .card-meta {
